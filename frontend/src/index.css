@@ -52,6 +52,13 @@
     --checkbox-checked-bg: #4a6fa5;
     --checkbox-checked-border: #3a5a8a;
     --checkbox-indicator: #ffffff;
+
+    /* Enhanced radio button colors for high visibility */
+    --radio-border: #4a6fa5;
+    --radio-border-hover: #3a5a8a;
+    --radio-checked-bg: #4a6fa5;
+    --radio-checked-border: #3a5a8a;
+    --radio-indicator: #ffffff;
   }
 
   .dark {
@@ -101,6 +108,13 @@
     --checkbox-checked-bg: #6b8fc7;
     --checkbox-checked-border: #8fa9c9;
     --checkbox-indicator: #ffffff;
+
+    /* Enhanced radio button colors for high visibility in dark mode */
+    --radio-border: #6b8fc7;
+    --radio-border-hover: #8fa9c9;
+    --radio-checked-bg: #6b8fc7;
+    --radio-checked-border: #8fa9c9;
+    --radio-indicator: #ffffff;
   }
 }
 
@@ -288,6 +302,113 @@
   button[role="checkbox"]:disabled:hover {
     transform: none !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  /* Enhanced Radio Button Styling - Significantly More Visible and Prominent */
+  button[role="radio"],
+  .enhanced-radio {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    border: 4px solid var(--radio-border) !important;
+    border-radius: 50% !important;
+    background-color: var(--card) !important;
+    transition: all 0.2s ease-in-out !important;
+    cursor: pointer !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
+    position: relative !important;
+  }
+
+  /* Radio button hover state */
+  button[role="radio"]:hover,
+  .enhanced-radio:hover {
+    border-color: var(--radio-border-hover) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
+    transform: scale(1.08);
+  }
+
+  /* Radio button focus state */
+  button[role="radio"]:focus-visible,
+  .enhanced-radio:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 4px var(--ring) !important;
+    border-color: var(--radio-border-hover) !important;
+  }
+
+  /* Radio button checked state */
+  button[role="radio"][data-state="checked"],
+  button[role="radio"][aria-checked="true"],
+  .enhanced-radio[data-state="checked"],
+  .enhanced-radio[aria-checked="true"] {
+    background-color: var(--radio-checked-bg) !important;
+    border-color: var(--radio-checked-border) !important;
+    box-shadow: 0 4px 12px rgba(74, 111, 165, 0.35) !important;
+  }
+
+  /* Radio button checked hover state */
+  button[role="radio"][data-state="checked"]:hover,
+  button[role="radio"][aria-checked="true"]:hover,
+  .enhanced-radio[data-state="checked"]:hover,
+  .enhanced-radio[aria-checked="true"]:hover {
+    background-color: var(--radio-border-hover) !important;
+    transform: scale(1.08);
+    box-shadow: 0 4px 14px rgba(74, 111, 165, 0.4) !important;
+  }
+
+  /* Radio button indicator (inner circle) styling */
+  button[role="radio"] span[data-state="checked"],
+  button[role="radio"][data-state="checked"] span,
+  .enhanced-radio span[data-state="checked"],
+  .enhanced-radio[data-state="checked"] span {
+    width: 10px !important;
+    height: 10px !important;
+    background-color: var(--radio-indicator) !important;
+    border-radius: 50% !important;
+    display: block !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+  }
+
+  /* Dark mode radio button adjustments */
+  .dark button[role="radio"],
+  .dark .enhanced-radio {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .dark button[role="radio"]:hover,
+  .dark .enhanced-radio:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  .dark button[role="radio"][data-state="checked"],
+  .dark button[role="radio"][aria-checked="true"],
+  .dark .enhanced-radio[data-state="checked"],
+  .dark .enhanced-radio[aria-checked="true"] {
+    box-shadow: 0 4px 12px rgba(107, 143, 199, 0.45) !important;
+  }
+
+  .dark button[role="radio"][data-state="checked"]:hover,
+  .dark button[role="radio"][aria-checked="true"]:hover,
+  .dark .enhanced-radio[data-state="checked"]:hover,
+  .dark .enhanced-radio[aria-checked="true"]:hover {
+    box-shadow: 0 4px 14px rgba(107, 143, 199, 0.5) !important;
+  }
+
+  /* Disabled radio button state */
+  button[role="radio"]:disabled,
+  .enhanced-radio:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+  }
+
+  button[role="radio"]:disabled:hover,
+  .enhanced-radio:disabled:hover {
+    transform: none !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
   }
 }
 

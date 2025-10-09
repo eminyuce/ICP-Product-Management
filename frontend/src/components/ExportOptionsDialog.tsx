@@ -49,21 +49,21 @@ export default function ExportOptionsDialog({
 
                 <div className="py-6">
                     <RadioGroup value={exportType} onValueChange={(value) => setExportType(value as 'all' | 'visible')}>
-                        <div className="space-y-4">
-                            <div className="flex items-center space-x-3">
-                                <RadioGroupItem value="all" id="export-all" />
-                                <Label htmlFor="export-all" className="cursor-pointer font-normal">
-                                    <div className="font-medium">Export all columns</div>
-                                    <div className="text-sm text-muted-foreground">
+                        <div className="space-y-5">
+                            <div className="flex items-start space-x-4 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors">
+                                <RadioGroupItem value="all" id="export-all" className="enhanced-radio mt-1" />
+                                <Label htmlFor="export-all" className="cursor-pointer font-normal flex-1">
+                                    <div className="font-semibold text-base">Export all columns</div>
+                                    <div className="text-sm text-muted-foreground mt-1">
                                         Include all available columns in the export
                                     </div>
                                 </Label>
                             </div>
-                            <div className="flex items-center space-x-3">
-                                <RadioGroupItem value="visible" id="export-visible" />
-                                <Label htmlFor="export-visible" className="cursor-pointer font-normal">
-                                    <div className="font-medium">Export only visible columns</div>
-                                    <div className="text-sm text-muted-foreground">
+                            <div className="flex items-start space-x-4 p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors">
+                                <RadioGroupItem value="visible" id="export-visible" className="enhanced-radio mt-1" />
+                                <Label htmlFor="export-visible" className="cursor-pointer font-normal flex-1">
+                                    <div className="font-semibold text-base">Export only visible columns</div>
+                                    <div className="text-sm text-muted-foreground mt-1">
                                         Export only the columns currently shown in the table
                                     </div>
                                 </Label>
