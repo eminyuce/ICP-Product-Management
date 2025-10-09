@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Loader2, X, Image as ImageIcon } from 'lucide-react';
 import {
@@ -49,7 +49,6 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fileError, setFileError] = useState<string | null>(null);
-    const firstInputRef = useRef<HTMLInputElement>(null);
 
     const {
         register,
@@ -57,6 +56,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
         reset,
         setValue,
         watch,
+        setFocus,
         formState: { errors },
     } = useForm<FormData>({
         defaultValues: {
@@ -73,42 +73,45 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
 
     const statusValue = watch('status');
 
+    // Reset form when dialog opens or product changes
     useEffect(() => {
-        if (product) {
-            reset({
-                name: product.name,
-                description: product.description,
-                price: product.price.toString(),
-                quantity: Number(product.quantity).toString(),
-                category: product.category,
-                sku: product.sku,
-                status: Number(product.status).toString(),
-                ordering: Number(product.ordering).toString(),
-            });
-        } else {
-            reset({
-                name: '',
-                description: '',
-                price: '',
-                quantity: '0',
-                category: '',
-                sku: '',
-                status: '0',
-                ordering: '0',
-            });
-        }
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        setFileError(null);
-    }, [product, reset, open]);
+        if (open) {
+            if (product) {
+                // Editing mode - populate with product data
+                reset({
+                    name: product.name,
+                    description: product.description,
+                    price: product.price.toString(),
+                    quantity: Number(product.quantity).toString(),
+                    category: product.category,
+                    sku: product.sku,
+                    status: Number(product.status).toString(),
+                    ordering: Number(product.ordering).toString(),
+                });
+            } else {
+                // Creation mode - reset to empty values
+                reset({
+                    name: '',
+                    description: '',
+                    price: '',
+                    quantity: '0',
+                    category: '',
+                    sku: '',
+                    status: '0',
+                    ordering: '0',
+                });
+            }
+            // Clear file selection when dialog opens
+            setSelectedFile(null);
+            setPreviewUrl(null);
+            setFileError(null);
 
-    useEffect(() => {
-        if (open && firstInputRef.current) {
+            // Focus the name field after a short delay
             setTimeout(() => {
-                firstInputRef.current?.focus();
+                setFocus('name');
             }, 100);
         }
-    }, [open]);
+    }, [open, product, reset, setFocus]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -180,10 +183,6 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto modal-solid-bg border border-border shadow-classic-xl rounded-lg"
-                onOpenAutoFocus={(e) => {
-                    e.preventDefault();
-                    setTimeout(() => firstInputRef.current?.focus(), 100);
-                }}
             >
                 <DialogHeader className="space-y-3">
                     <DialogTitle className="text-2xl font-semibold text-primary">
@@ -206,7 +205,6 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                 id="name"
                                 {...register('name', { required: 'Name is required' })}
                                 placeholder="Enter product name"
-                                ref={firstInputRef}
                                 className="h-11 border border-border rounded-lg"
                             />
                             {errors.name && (
