@@ -1,6 +1,8 @@
 # Product Management App
 
 A web application for managing product inventory with full CRUD operations and REST API endpoints.
+here it is, take a look at it
+https://product-admin-page-rh2.caffeine.xyz/
 
 ## Core Features
 
