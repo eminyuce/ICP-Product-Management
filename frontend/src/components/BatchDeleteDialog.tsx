@@ -42,7 +42,6 @@ export default function BatchDeleteDialog({
         }
     };
 
-    // Focus cancel button when dialog opens
     useEffect(() => {
         if (open && cancelButtonRef.current) {
             setTimeout(() => {
@@ -53,28 +52,29 @@ export default function BatchDeleteDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Multiple Products</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Are you sure you want to delete <strong>{productCount}</strong> selected product{productCount !== 1 ? 's' : ''}?
+            <AlertDialogContent className="modal-solid-bg border border-destructive shadow-classic-xl rounded-lg">
+                <AlertDialogHeader className="space-y-3">
+                    <AlertDialogTitle className="text-2xl font-semibold">Delete Multiple Products</AlertDialogTitle>
+                    <AlertDialogDescription className="text-base">
+                        Are you sure you want to delete <strong className="text-foreground">{productCount}</strong> selected product{productCount !== 1 ? 's' : ''}?
                         This action cannot be undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
+                <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel
                         disabled={deleteMutation.isPending}
                         ref={cancelButtonRef}
+                        className="h-11 px-6 rounded-lg"
                     >
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={deleteMutation.isPending}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="h-11 px-6 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-classic-md"
                     >
                         {deleteMutation.isPending && (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                         )}
                         Delete {productCount} Product{productCount !== 1 ? 's' : ''}
                     </AlertDialogAction>

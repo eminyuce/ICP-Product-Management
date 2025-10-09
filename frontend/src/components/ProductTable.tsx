@@ -290,7 +290,6 @@ export default function ProductTable() {
             return;
         }
 
-        // Define all possible columns
         const allColumns = [
             { key: 'id', label: 'ID', visible: columnVisibility.id },
             { key: 'name', label: 'Name', visible: columnVisibility.name },
@@ -304,7 +303,6 @@ export default function ProductTable() {
             { key: 'updated_at', label: 'Updated', visible: columnVisibility.updated_at },
         ];
 
-        // Filter columns based on export type
         const columnsToExport = exportType === 'all'
             ? allColumns
             : allColumns.filter(col => col.visible);
@@ -424,27 +422,27 @@ export default function ProductTable() {
 
     if (isLoading) {
         return (
-            <div className="space-y-4">
-                <div className="flex gap-2">
-                    <Skeleton className="h-10 flex-1" />
-                    <Skeleton className="h-10 w-24" />
+            <div className="space-y-6 animate-fade-in">
+                <div className="flex gap-3">
+                    <Skeleton className="h-12 flex-1 rounded-lg" />
+                    <Skeleton className="h-12 w-32 rounded-lg" />
                 </div>
                 {showFilters && (
-                    <Card className="bg-card border-border">
+                    <Card className="bg-card border border-border shadow-classic-md rounded-lg">
                         <CardContent className="p-6">
                             <div className="space-y-4">
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-10 w-full" />
-                                <Skeleton className="h-10 w-full" />
+                                <Skeleton className="h-12 w-full rounded-lg" />
+                                <Skeleton className="h-12 w-full rounded-lg" />
+                                <Skeleton className="h-12 w-full rounded-lg" />
                             </div>
                         </CardContent>
                     </Card>
                 )}
-                <Card className="bg-card border-border">
+                <Card className="bg-card border border-border shadow-classic-md rounded-lg">
                     <CardContent className="p-6">
                         <div className="space-y-4">
                             {[...Array(5)].map((_, i) => (
-                                <Skeleton key={i} className="h-16 w-full" />
+                                <Skeleton key={i} className="h-20 w-full rounded-lg" />
                             ))}
                         </div>
                     </CardContent>
@@ -496,6 +494,7 @@ export default function ProductTable() {
                         <PaginationLink
                             onClick={() => setCurrentPage(i)}
                             isActive={currentPage === i}
+                            className="rounded-md"
                         >
                             {i}
                         </PaginationLink>
@@ -508,6 +507,7 @@ export default function ProductTable() {
                     <PaginationLink
                         onClick={() => setCurrentPage(1)}
                         isActive={currentPage === 1}
+                        className="rounded-md"
                     >
                         1
                     </PaginationLink>
@@ -531,6 +531,7 @@ export default function ProductTable() {
                         <PaginationLink
                             onClick={() => setCurrentPage(i)}
                             isActive={currentPage === i}
+                            className="rounded-md"
                         >
                             {i}
                         </PaginationLink>
@@ -551,6 +552,7 @@ export default function ProductTable() {
                     <PaginationLink
                         onClick={() => setCurrentPage(totalPages)}
                         isActive={currentPage === totalPages}
+                        className="rounded-md"
                     >
                         {totalPages}
                     </PaginationLink>
@@ -563,34 +565,34 @@ export default function ProductTable() {
 
     return (
         <>
-            <div className="mb-4 space-y-4">
-                <div className="flex gap-2">
+            <div className="mb-6 space-y-5 animate-slide-up">
+                <div className="flex gap-3">
                     <Input
                         placeholder="Search across all fields..."
                         value={globalSearch}
                         onChange={(e) => setGlobalSearch(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleGlobalSearch()}
-                        className="flex-1 bg-input border-border"
+                        className="flex-1 h-12 bg-input border border-border rounded-lg shadow-classic"
                     />
-                    <Button onClick={handleGlobalSearch} className="gap-2">
-                        <Search className="h-4 w-4" />
+                    <Button onClick={handleGlobalSearch} className="gap-2 h-12 px-6 rounded-lg shadow-classic">
+                        <Search className="h-5 w-5" />
                         Search
                     </Button>
                     {filters.search && (
-                        <Button variant="outline" onClick={handleClearGlobalSearch} className="gap-2">
-                            <X className="h-4 w-4" />
+                        <Button variant="outline" onClick={handleClearGlobalSearch} className="gap-2 h-12 px-6 rounded-lg shadow-classic">
+                            <X className="h-5 w-5" />
                             Clear
                         </Button>
                     )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-3">
                     <Button
                         variant="outline"
                         onClick={() => setShowFilters(!showFilters)}
-                        className="gap-2"
+                        className="gap-2 h-11 px-5 rounded-lg shadow-classic"
                     >
-                        <Filter className="h-4 w-4" />
+                        <Filter className="h-5 w-5" />
                         {showFilters ? 'Hide Filters' : 'Show Filters'}
                     </Button>
 
@@ -600,39 +602,42 @@ export default function ProductTable() {
                                 <Button
                                     variant="outline"
                                     onClick={() => handleSelectAll(true)}
-                                    className="gap-2"
+                                    className="gap-2 h-11 px-5 rounded-lg shadow-classic"
                                 >
-                                    <CheckSquare className="h-4 w-4" />
+                                    <CheckSquare className="h-5 w-5" />
                                     Select All
                                 </Button>
                             )}
                             <Button
                                 variant="outline"
                                 onClick={() => setSelectedIds(new Set())}
-                                className="gap-2"
+                                className="gap-2 h-11 px-5 rounded-lg shadow-classic"
                             >
-                                <Square className="h-4 w-4" />
+                                <Square className="h-5 w-5" />
                                 Deselect All
                             </Button>
                             <Button
                                 variant="destructive"
                                 onClick={() => setShowBatchDelete(true)}
-                                className="gap-2"
+                                className="gap-2 h-11 px-5 rounded-lg shadow-classic-md"
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-5 w-5" />
                                 Delete Selected ({selectedIds.size})
                             </Button>
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline">Product State Selection</Button>
+                                    <Button variant="outline" className="h-11 px-5 rounded-lg shadow-classic">
+                                        Product State Selection
+                                    </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent className="bg-popover border-border">
+                                <DropdownMenuContent className="bg-popover border border-border shadow-classic-lg rounded-lg">
                                     <DropdownMenuLabel>Set Status</DropdownMenuLabel>
                                     {Object.entries(STATUS_LABELS).map(([status, label]) => (
                                         <DropdownMenuItem
                                             key={status}
                                             onClick={() => handleBatchUpdateStatus(BigInt(status))}
+                                            className="rounded-md"
                                         >
                                             {label}
                                         </DropdownMenuItem>
@@ -645,18 +650,18 @@ export default function ProductTable() {
                     <Button
                         variant="outline"
                         onClick={() => setShowManageColumns(true)}
-                        className="gap-2 ml-auto"
+                        className="gap-2 h-11 px-5 rounded-lg shadow-classic ml-auto"
                     >
-                        <Settings className="h-4 w-4" />
+                        <Settings className="h-5 w-5" />
                         Manage Columns
                     </Button>
 
                     <Button
                         variant="outline"
                         onClick={() => setShowExportOptions(true)}
-                        className="gap-2"
+                        className="gap-2 h-11 px-5 rounded-lg shadow-classic"
                     >
-                        <Download className="h-4 w-4" />
+                        <Download className="h-5 w-5" />
                         Excel Export
                     </Button>
 
@@ -664,74 +669,80 @@ export default function ProductTable() {
                         variant="secondary"
                         onClick={handleBulkCreateSamples}
                         disabled={bulkCreateSampleMutation.isPending}
-                        className="gap-2"
+                        className="gap-2 h-11 px-5 rounded-lg shadow-classic"
                     >
-                        <Plus className="h-4 w-4" />
+                        <Plus className="h-5 w-5" />
                         {bulkCreateSampleMutation.isPending ? 'Creating...' : 'Add 100 Sample Products'}
                     </Button>
                 </div>
 
                 {hasActiveFilters && (
-                    <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/50 rounded-lg border border-border">
-                        <span className="text-sm font-medium text-muted-foreground">Active Filters:</span>
-                        {activeFilters.map((filter) => (
-                            <Badge
-                                key={filter.key}
-                                variant="secondary"
-                                className="gap-1.5 pl-3 pr-2 py-1.5 text-sm font-normal bg-background border border-border hover:bg-accent"
-                            >
-                                <span className="font-medium">{filter.label}:</span>
-                                <span className="text-muted-foreground">{filter.value}</span>
-                                <button
-                                    onClick={() => {
-                                        if (filter.key === 'createdFrom') {
-                                            handleRemoveDateRangeFilter('created');
-                                        } else if (filter.key === 'updatedFrom') {
-                                            handleRemoveDateRangeFilter('updated');
-                                        } else {
-                                            handleRemoveFilter(filter.key);
-                                        }
-                                    }}
-                                    className="ml-1 rounded-full hover:bg-muted p-0.5 transition-colors"
-                                    aria-label={`Remove ${filter.label} filter`}
+                    <Card className="bg-secondary border border-border shadow-classic-md rounded-lg animate-scale-in">
+                        <CardContent className="p-5">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="text-sm font-semibold text-foreground mr-1">Active Filters:</span>
+                                {activeFilters.map((filter) => (
+                                    <div
+                                        key={filter.key}
+                                        className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-card border border-border hover:bg-muted transition-all group shadow-classic"
+                                    >
+                                        <span className="text-sm">
+                                            <span className="font-semibold text-foreground">{filter.label}:</span>
+                                            <span className="ml-2 text-muted-foreground">{filter.value}</span>
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                if (filter.key === 'createdFrom') {
+                                                    handleRemoveDateRangeFilter('created');
+                                                } else if (filter.key === 'updatedFrom') {
+                                                    handleRemoveDateRangeFilter('updated');
+                                                } else {
+                                                    handleRemoveFilter(filter.key);
+                                                }
+                                            }}
+                                            className="flex items-center justify-center w-6 h-6 rounded-full hover:bg-destructive/20 hover:text-destructive transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                                            aria-label={`Remove ${filter.label} filter`}
+                                            title={`Remove ${filter.label} filter`}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleClearFilters}
+                                    className="h-9 px-4 text-sm rounded-md hover:bg-destructive/20 hover:text-destructive"
                                 >
-                                    <X className="h-3 w-3" />
-                                </button>
-                            </Badge>
-                        ))}
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={handleClearFilters}
-                            className="h-7 px-2 text-xs"
-                        >
-                            Clear All
-                        </Button>
-                    </div>
+                                    Clear All Filters
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
                 )}
             </div>
 
             {showFilters && (
-                <Card className="mb-4 bg-card border-border">
+                <Card className="mb-6 bg-card border border-border shadow-classic-md rounded-lg animate-slide-in">
                     <CardContent className="p-6">
-                        <div className="space-y-4">
+                        <div className="space-y-6">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-semibold">Filter Products</h3>
+                                <h3 className="text-xl font-semibold">Filter Products</h3>
                                 {hasActiveFilters && (
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={handleClearFilters}
-                                        className="gap-2"
+                                        className="gap-2 rounded-md"
                                     >
                                         <X className="h-4 w-4" />
                                         Clear Filters
                                     </Button>
                                 )}
                             </div>
-                            <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-5">
+                            <div className="grid gap-5 md:grid-cols-3 lg:grid-cols-5">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Product Name</label>
+                                    <label className="text-sm font-semibold">Product Name</label>
                                     <Input
                                         placeholder="Search by name..."
                                         value={tempFilters.name}
@@ -739,23 +750,23 @@ export default function ProductTable() {
                                             setTempFilters({ ...tempFilters, name: e.target.value })
                                         }
                                         onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-                                        className="bg-input border-border"
+                                        className="bg-input border border-border rounded-lg"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Category</label>
+                                    <label className="text-sm font-semibold">Category</label>
                                     <Select
                                         value={tempFilters.category || undefined}
                                         onValueChange={(value) =>
                                             setTempFilters({ ...tempFilters, category: value })
                                         }
                                     >
-                                        <SelectTrigger className="bg-input border-border">
+                                        <SelectTrigger className="bg-input border border-border rounded-lg">
                                             <SelectValue placeholder="All categories" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-popover border-border">
+                                        <SelectContent className="bg-popover border border-border shadow-classic-lg rounded-lg">
                                             {categories.map((category) => (
-                                                <SelectItem key={category} value={category}>
+                                                <SelectItem key={category} value={category} className="rounded-md">
                                                     {category}
                                                 </SelectItem>
                                             ))}
@@ -766,14 +777,14 @@ export default function ProductTable() {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => setTempFilters({ ...tempFilters, category: '' })}
-                                            className="h-6 px-2 text-xs"
+                                            className="h-7 px-3 text-xs rounded-md"
                                         >
                                             Clear
                                         </Button>
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">SKU</label>
+                                    <label className="text-sm font-semibold">SKU</label>
                                     <Input
                                         placeholder="Search by SKU..."
                                         value={tempFilters.sku}
@@ -781,23 +792,23 @@ export default function ProductTable() {
                                             setTempFilters({ ...tempFilters, sku: e.target.value })
                                         }
                                         onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-                                        className="bg-input border-border"
+                                        className="bg-input border border-border rounded-lg"
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Status</label>
+                                    <label className="text-sm font-semibold">Status</label>
                                     <Select
                                         value={tempFilters.status || undefined}
                                         onValueChange={(value) =>
                                             setTempFilters({ ...tempFilters, status: value })
                                         }
                                     >
-                                        <SelectTrigger className="bg-input border-border">
+                                        <SelectTrigger className="bg-input border border-border rounded-lg">
                                             <SelectValue placeholder="All statuses" />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-popover border-border">
+                                        <SelectContent className="bg-popover border border-border shadow-classic-lg rounded-lg">
                                             {Object.entries(STATUS_LABELS).map(([status, label]) => (
-                                                <SelectItem key={status} value={status}>
+                                                <SelectItem key={status} value={status} className="rounded-md">
                                                     {label}
                                                 </SelectItem>
                                             ))}
@@ -808,14 +819,14 @@ export default function ProductTable() {
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => setTempFilters({ ...tempFilters, status: '' })}
-                                            className="h-6 px-2 text-xs"
+                                            className="h-7 px-3 text-xs rounded-md"
                                         >
                                             Clear
                                         </Button>
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-medium">Ordering</label>
+                                    <label className="text-sm font-semibold">Ordering</label>
                                     <Input
                                         placeholder="Filter by ordering..."
                                         value={tempFilters.ordering}
@@ -823,64 +834,64 @@ export default function ProductTable() {
                                             setTempFilters({ ...tempFilters, ordering: e.target.value })
                                         }
                                         onKeyDown={(e) => e.key === 'Enter' && handleApplyFilters()}
-                                        className="bg-input border-border"
+                                        className="bg-input border border-border rounded-lg"
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-3 pt-2">
-                                <h4 className="text-sm font-semibold">Date Range Filters</h4>
-                                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <div className="space-y-4 pt-3">
+                                <h4 className="text-base font-semibold">Date Range Filters</h4>
+                                <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Created From</label>
+                                        <label className="text-sm font-semibold">Created From</label>
                                         <Input
                                             type="date"
                                             value={tempFilters.createdFrom}
                                             onChange={(e) =>
                                                 setTempFilters({ ...tempFilters, createdFrom: e.target.value })
                                             }
-                                            className="bg-input border-border"
+                                            className="bg-input border border-border rounded-lg"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Created To</label>
+                                        <label className="text-sm font-semibold">Created To</label>
                                         <Input
                                             type="date"
                                             value={tempFilters.createdTo}
                                             onChange={(e) =>
                                                 setTempFilters({ ...tempFilters, createdTo: e.target.value })
                                             }
-                                            className="bg-input border-border"
+                                            className="bg-input border border-border rounded-lg"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Updated From</label>
+                                        <label className="text-sm font-semibold">Updated From</label>
                                         <Input
                                             type="date"
                                             value={tempFilters.updatedFrom}
                                             onChange={(e) =>
                                                 setTempFilters({ ...tempFilters, updatedFrom: e.target.value })
                                             }
-                                            className="bg-input border-border"
+                                            className="bg-input border border-border rounded-lg"
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium">Updated To</label>
+                                        <label className="text-sm font-semibold">Updated To</label>
                                         <Input
                                             type="date"
                                             value={tempFilters.updatedTo}
                                             onChange={(e) =>
                                                 setTempFilters({ ...tempFilters, updatedTo: e.target.value })
                                             }
-                                            className="bg-input border-border"
+                                            className="bg-input border border-border rounded-lg"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex justify-end">
-                                <Button onClick={handleApplyFilters} className="gap-2">
-                                    <Search className="h-4 w-4" />
+                            <div className="flex justify-end pt-2">
+                                <Button onClick={handleApplyFilters} className="gap-2 h-11 px-6 rounded-lg shadow-classic">
+                                    <Search className="h-5 w-5" />
                                     Apply Filters
                                 </Button>
                             </div>
@@ -890,15 +901,15 @@ export default function ProductTable() {
             )}
 
             {products.length === 0 ? (
-                <Card className="bg-card border-border">
-                    <CardContent className="flex flex-col items-center justify-center py-16">
-                        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted">
-                            <Package className="h-10 w-10 text-muted-foreground" />
+                <Card className="bg-card border border-border shadow-classic-md rounded-lg animate-scale-in">
+                    <CardContent className="flex flex-col items-center justify-center py-20">
+                        <div className="flex h-24 w-24 items-center justify-center rounded-lg bg-secondary shadow-classic">
+                            <Package className="h-12 w-12 text-primary" />
                         </div>
-                        <h3 className="mt-4 text-lg font-semibold">
+                        <h3 className="mt-6 text-xl font-semibold">
                             {hasActiveFilters ? 'No products found' : 'No products yet'}
                         </h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
+                        <p className="mt-3 text-base text-muted-foreground">
                             {hasActiveFilters
                                 ? 'Try adjusting your filters or search'
                                 : 'Get started by adding your first product'}
@@ -907,12 +918,12 @@ export default function ProductTable() {
                 </Card>
             ) : (
                 <>
-                    <Card className="bg-card border-border">
+                    <Card className="bg-card border border-border shadow-classic-md rounded-lg overflow-hidden animate-scale-in">
                         <CardContent className="p-0">
                             <div className="overflow-x-auto">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow>
+                                        <TableRow className="border-b border-border bg-secondary">
                                             <TableHead className="w-12">
                                                 <Checkbox
                                                     checked={allSelected || (someSelected ? 'indeterminate' : false)}
@@ -925,7 +936,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('id')}
                                                     >
                                                         ID
@@ -938,7 +949,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('name')}
                                                     >
                                                         Name
@@ -951,7 +962,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('sku')}
                                                     >
                                                         SKU
@@ -964,7 +975,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('category')}
                                                     >
                                                         Category
@@ -977,7 +988,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('price')}
                                                     >
                                                         Price
@@ -990,7 +1001,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('quantity')}
                                                     >
                                                         Quantity
@@ -1003,7 +1014,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('status')}
                                                     >
                                                         Status
@@ -1016,7 +1027,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('ordering')}
                                                     >
                                                         Ordering
@@ -1029,7 +1040,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('created_at')}
                                                     >
                                                         Created
@@ -1042,7 +1053,7 @@ export default function ProductTable() {
                                                     <Button
                                                         variant="ghost"
                                                         size="sm"
-                                                        className="h-8 px-2"
+                                                        className="h-9 px-3 font-semibold rounded-md"
                                                         onClick={() => handleSort('updated_at')}
                                                     >
                                                         Updated
@@ -1050,7 +1061,7 @@ export default function ProductTable() {
                                                     </Button>
                                                 </TableHead>
                                             )}
-                                            <TableHead className="w-32 text-right">Actions</TableHead>
+                                            <TableHead className="w-32 text-right font-semibold">Actions</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -1059,7 +1070,7 @@ export default function ProductTable() {
                                             return (
                                                 <TableRow
                                                     key={Number(product.id)}
-                                                    className={isSelected ? 'bg-blue-100 dark:bg-blue-950' : ''}
+                                                    className={`border-b border-border transition-colors ${isSelected ? 'bg-secondary' : 'hover:bg-muted'}`}
                                                 >
                                                     <TableCell>
                                                         <Checkbox
@@ -1071,7 +1082,7 @@ export default function ProductTable() {
                                                         />
                                                     </TableCell>
                                                     {columnVisibility.id && (
-                                                        <TableCell className="font-medium">
+                                                        <TableCell className="font-semibold">
                                                             {Number(product.id)}
                                                         </TableCell>
                                                     )}
@@ -1080,7 +1091,7 @@ export default function ProductTable() {
                                                             <Link
                                                                 to="/product/$productId"
                                                                 params={{ productId: product.id.toString() }}
-                                                                className="font-medium text-primary hover:underline"
+                                                                className="font-semibold text-primary hover:text-accent transition-colors underline"
                                                             >
                                                                 {product.name}
                                                             </Link>
@@ -1088,7 +1099,9 @@ export default function ProductTable() {
                                                     )}
                                                     {columnVisibility.sku && (
                                                         <TableCell>
-                                                            <Badge variant="outline">{product.sku}</Badge>
+                                                            <Badge variant="outline" className="rounded-md">
+                                                                {product.sku}
+                                                            </Badge>
                                                         </TableCell>
                                                     )}
                                                     {columnVisibility.category && (
@@ -1099,7 +1112,7 @@ export default function ProductTable() {
                                                         </TableCell>
                                                     )}
                                                     {columnVisibility.price && (
-                                                        <TableCell className="text-right font-medium">
+                                                        <TableCell className="text-right font-semibold">
                                                             {editingCell?.id === product.id && editingCell.field === 'price' ? (
                                                                 <div className="flex items-center justify-end gap-1">
                                                                     <Input
@@ -1112,14 +1125,14 @@ export default function ProductTable() {
                                                                             if (e.key === 'Escape') handleCancelEdit();
                                                                         }}
                                                                         onBlur={handleSaveEdit}
-                                                                        className="h-8 w-24 text-right bg-input border-border"
+                                                                        className="h-9 w-28 text-right bg-input border border-border rounded-md"
                                                                         autoFocus
                                                                     />
                                                                 </div>
                                                             ) : (
                                                                 <button
                                                                     onClick={() => handleStartEdit(product, 'price')}
-                                                                    className="hover:underline cursor-pointer"
+                                                                    className="hover:text-accent transition-colors cursor-pointer"
                                                                 >
                                                                     {formatPrice(product.price)}
                                                                 </button>
@@ -1140,7 +1153,7 @@ export default function ProductTable() {
                                                                             if (e.key === 'Escape') handleCancelEdit();
                                                                         }}
                                                                         onBlur={handleSaveEdit}
-                                                                        className="h-8 w-20 text-right bg-input border-border"
+                                                                        className="h-9 w-24 text-right bg-input border border-border rounded-md"
                                                                         autoFocus
                                                                     />
                                                                 </div>
@@ -1153,6 +1166,7 @@ export default function ProductTable() {
                                                                         variant={
                                                                             Number(product.quantity) > 0 ? 'default' : 'destructive'
                                                                         }
+                                                                        className="rounded-md"
                                                                     >
                                                                         {Number(product.quantity)}
                                                                     </Badge>
@@ -1170,12 +1184,12 @@ export default function ProductTable() {
                                                                             handleStatusChange(product.id, value);
                                                                         }}
                                                                     >
-                                                                        <SelectTrigger className="h-8 w-[180px] bg-input border-border">
+                                                                        <SelectTrigger className="h-9 w-[200px] bg-input border border-border rounded-md">
                                                                             <SelectValue />
                                                                         </SelectTrigger>
-                                                                        <SelectContent className="bg-popover border-border">
+                                                                        <SelectContent className="bg-popover border border-border shadow-classic-lg rounded-lg">
                                                                             {Object.entries(STATUS_LABELS).map(([status, label]) => (
-                                                                                <SelectItem key={status} value={status}>
+                                                                                <SelectItem key={status} value={status} className="rounded-md">
                                                                                     {label}
                                                                                 </SelectItem>
                                                                             ))}
@@ -1187,7 +1201,7 @@ export default function ProductTable() {
                                                                     onClick={() => handleStartEdit(product, 'status')}
                                                                     className="cursor-pointer inline-flex items-center justify-center"
                                                                 >
-                                                                    <div className={`px-3 py-1.5 rounded text-sm font-medium ${getStatusColor(Number(product.status))}`}>
+                                                                    <div className={`px-4 py-2 rounded-md text-sm font-semibold border ${getStatusColor(Number(product.status))}`}>
                                                                         {getStatusLabel(Number(product.status))}
                                                                     </div>
                                                                 </button>
@@ -1208,14 +1222,14 @@ export default function ProductTable() {
                                                                             if (e.key === 'Escape') handleCancelEdit();
                                                                         }}
                                                                         onBlur={handleSaveEdit}
-                                                                        className="h-8 w-20 text-center bg-input border-border"
+                                                                        className="h-9 w-24 text-center bg-input border border-border rounded-md"
                                                                         autoFocus
                                                                     />
                                                                 </div>
                                                             ) : (
                                                                 <button
                                                                     onClick={() => handleStartEdit(product, 'ordering')}
-                                                                    className="cursor-pointer hover:underline"
+                                                                    className="cursor-pointer hover:text-accent transition-colors font-semibold"
                                                                 >
                                                                     {Number(product.ordering)}
                                                                 </button>
@@ -1239,24 +1253,27 @@ export default function ProductTable() {
                                                                 size="icon"
                                                                 onClick={() => navigate({ to: '/product/$productId', params: { productId: product.id.toString() } })}
                                                                 title="View Details"
+                                                                className="rounded-md hover:bg-accent/20 transition-all"
                                                             >
-                                                                <Eye className="h-4 w-4" />
+                                                                <Eye className="h-5 w-5" />
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() => setEditingProduct(product)}
                                                                 title="Edit Product"
+                                                                className="rounded-md hover:bg-primary/20 transition-all"
                                                             >
-                                                                <Edit className="h-4 w-4" />
+                                                                <Edit className="h-5 w-5" />
                                                             </Button>
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
                                                                 onClick={() => setDeletingProduct(product)}
                                                                 title="Delete Product"
+                                                                className="rounded-md hover:bg-destructive/20 transition-all"
                                                             >
-                                                                <Trash2 className="h-4 w-4" />
+                                                                <Trash2 className="h-5 w-5" />
                                                             </Button>
                                                         </div>
                                                     </TableCell>
@@ -1270,21 +1287,21 @@ export default function ProductTable() {
                     </Card>
 
                     {totalPages > 1 && (
-                        <div className="mt-4 flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <p className="text-sm text-muted-foreground">
+                        <div className="mt-6 flex items-center justify-between animate-fade-in">
+                            <div className="flex items-center gap-5">
+                                <p className="text-sm font-semibold text-muted-foreground">
                                     Showing {(currentPage - 1) * pageSize + 1} to{' '}
                                     {Math.min(currentPage * pageSize, totalCount)} of {totalCount} products
                                 </p>
-                                <div className="flex items-center gap-2">
-                                    <label className="text-sm text-muted-foreground">Items per page:</label>
+                                <div className="flex items-center gap-3">
+                                    <label className="text-sm font-semibold text-muted-foreground">Items per page:</label>
                                     <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
-                                        <SelectTrigger className="h-9 w-[80px] bg-input border-border">
+                                        <SelectTrigger className="h-10 w-[90px] bg-card border border-border rounded-lg shadow-classic">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-popover border-border">
+                                        <SelectContent className="bg-popover border border-border shadow-classic-lg rounded-lg">
                                             {PAGE_SIZE_OPTIONS.map((size) => (
-                                                <SelectItem key={size} value={size.toString()}>
+                                                <SelectItem key={size} value={size.toString()} className="rounded-md">
                                                     {size}
                                                 </SelectItem>
                                             ))}
@@ -1297,18 +1314,18 @@ export default function ProductTable() {
                                     <PaginationItem>
                                         <PaginationPrevious
                                             onClick={() => hasPreviousPage && setCurrentPage(currentPage - 1)}
-                                            className={
-                                                !hasPreviousPage ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                                            }
+                                            className={`rounded-md ${
+                                                !hasPreviousPage ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:bg-secondary'
+                                            }`}
                                         />
                                     </PaginationItem>
                                     {renderPaginationItems()}
                                     <PaginationItem>
                                         <PaginationNext
                                             onClick={() => hasNextPage && setCurrentPage(currentPage + 1)}
-                                            className={
-                                                !hasNextPage ? 'pointer-events-none opacity-50' : 'cursor-pointer'
-                                            }
+                                            className={`rounded-md ${
+                                                !hasNextPage ? 'pointer-events-none opacity-50' : 'cursor-pointer hover:bg-secondary'
+                                            }`}
                                         />
                                     </PaginationItem>
                                 </PaginationContent>

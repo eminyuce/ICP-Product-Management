@@ -97,13 +97,11 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                 ordering: '0',
             });
         }
-        // Reset file selection when dialog opens/closes or product changes
         setSelectedFile(null);
         setPreviewUrl(null);
         setFileError(null);
     }, [product, reset, open]);
 
-    // Focus first input when dialog opens
     useEffect(() => {
         if (open && firstInputRef.current) {
             setTimeout(() => {
@@ -122,7 +120,6 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
             return;
         }
 
-        // Validate file type
         const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
         if (!validTypes.includes(file.type)) {
             setFileError('Only JPEG and PNG images are allowed');
@@ -134,7 +131,6 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
 
         setSelectedFile(file);
 
-        // Create preview URL
         const reader = new FileReader();
         reader.onloadend = () => {
             setPreviewUrl(reader.result as string);
@@ -183,15 +179,17 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
-                className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"
+                className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto modal-solid-bg border border-border shadow-classic-xl rounded-lg"
                 onOpenAutoFocus={(e) => {
                     e.preventDefault();
                     setTimeout(() => firstInputRef.current?.focus(), 100);
                 }}
             >
-                <DialogHeader>
-                    <DialogTitle>{isEditing ? 'Edit Product' : 'Add New Product'}</DialogTitle>
-                    <DialogDescription>
+                <DialogHeader className="space-y-3">
+                    <DialogTitle className="text-2xl font-semibold text-primary">
+                        {isEditing ? 'Edit Product' : 'Add New Product'}
+                    </DialogTitle>
+                    <DialogDescription className="text-base">
                         {isEditing
                             ? 'Update the product information below.'
                             : 'Fill in the details to create a new product.'}
@@ -199,9 +197,9 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                 </DialogHeader>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
-                    <div className="grid gap-4 py-4">
+                    <div className="grid gap-5 py-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">
+                            <Label htmlFor="name" className="text-sm font-semibold">
                                 Name <span className="text-destructive">*</span>
                             </Label>
                             <Input
@@ -209,6 +207,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                 {...register('name', { required: 'Name is required' })}
                                 placeholder="Enter product name"
                                 ref={firstInputRef}
+                                className="h-11 border border-border rounded-lg"
                             />
                             {errors.name && (
                                 <p className="text-sm text-destructive">{errors.name.message}</p>
@@ -216,18 +215,18 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="description">Description</Label>
+                            <Label htmlFor="description" className="text-sm font-semibold">Description</Label>
                             <Textarea
                                 id="description"
                                 {...register('description')}
                                 placeholder="Enter product description..."
                                 rows={4}
-                                className="resize-none"
+                                className="resize-none border border-border rounded-lg"
                             />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="image">Product Image (Optional)</Label>
+                            <Label htmlFor="image" className="text-sm font-semibold">Product Image (Optional)</Label>
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2">
                                     <Input
@@ -236,7 +235,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                         accept="image/jpeg,image/jpg,image/png"
                                         onChange={handleFileChange}
                                         disabled={isLoading}
-                                        className="cursor-pointer"
+                                        className="cursor-pointer border border-border rounded-lg"
                                     />
                                     {selectedFile && (
                                         <Button
@@ -245,8 +244,9 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                             size="icon"
                                             onClick={clearFile}
                                             disabled={isLoading}
+                                            className="rounded-lg"
                                         >
-                                            <X className="h-4 w-4" />
+                                            <X className="h-5 w-5" />
                                         </Button>
                                     )}
                                 </div>
@@ -257,20 +257,20 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                     <p className="text-sm text-destructive">{fileError}</p>
                                 )}
                                 {previewUrl && (
-                                    <div className="relative w-full max-w-xs rounded-lg border bg-muted/30 p-2">
+                                    <div className="relative w-full max-w-xs rounded-lg border border-border bg-secondary p-3 shadow-classic">
                                         <img
                                             src={previewUrl}
                                             alt="Preview"
-                                            className="w-full h-auto rounded object-contain max-h-48"
+                                            className="w-full h-auto rounded-md object-contain max-h-48"
                                         />
-                                        <div className="absolute top-3 right-3">
+                                        <div className="absolute top-4 right-4">
                                             <Button
                                                 type="button"
                                                 variant="secondary"
                                                 size="icon"
                                                 onClick={clearFile}
                                                 disabled={isLoading}
-                                                className="h-7 w-7"
+                                                className="h-8 w-8 rounded-md shadow-classic"
                                             >
                                                 <X className="h-4 w-4" />
                                             </Button>
@@ -278,9 +278,9 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                     </div>
                                 )}
                                 {!previewUrl && !selectedFile && (
-                                    <div className="flex items-center justify-center w-full max-w-xs h-32 border-2 border-dashed rounded-lg bg-muted/20">
+                                    <div className="flex items-center justify-center w-full max-w-xs h-32 border border-dashed border-border rounded-lg bg-secondary">
                                         <div className="text-center">
-                                            <ImageIcon className="mx-auto h-8 w-8 text-muted-foreground" />
+                                            <ImageIcon className="mx-auto h-10 w-10 text-muted-foreground" />
                                             <p className="mt-2 text-xs text-muted-foreground">No image selected</p>
                                         </div>
                                     </div>
@@ -290,7 +290,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="price">
+                                <Label htmlFor="price" className="text-sm font-semibold">
                                     Price <span className="text-destructive">*</span>
                                 </Label>
                                 <Input
@@ -302,6 +302,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                         min: { value: 0.01, message: 'Price must be greater than 0' },
                                     })}
                                     placeholder="0.00"
+                                    className="h-11 border border-border rounded-lg"
                                 />
                                 {errors.price && (
                                     <p className="text-sm text-destructive">{errors.price.message}</p>
@@ -309,7 +310,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="quantity">
+                                <Label htmlFor="quantity" className="text-sm font-semibold">
                                     Quantity <span className="text-destructive">*</span>
                                 </Label>
                                 <Input
@@ -320,6 +321,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                         min: { value: 0, message: 'Quantity cannot be negative' },
                                     })}
                                     placeholder="0"
+                                    className="h-11 border border-border rounded-lg"
                                 />
                                 {errors.quantity && (
                                     <p className="text-sm text-destructive">{errors.quantity.message}</p>
@@ -327,28 +329,29 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="category">Category</Label>
+                                <Label htmlFor="category" className="text-sm font-semibold">Category</Label>
                                 <Input
                                     id="category"
                                     {...register('category')}
                                     placeholder="Enter category"
+                                    className="h-11 border border-border rounded-lg"
                                 />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-4">
                             <div className="grid gap-2">
-                                <Label htmlFor="status">Status</Label>
+                                <Label htmlFor="status" className="text-sm font-semibold">Status</Label>
                                 <Select
                                     value={statusValue}
                                     onValueChange={(value) => setValue('status', value)}
                                 >
-                                    <SelectTrigger id="status">
+                                    <SelectTrigger id="status" className="h-11 border border-border rounded-lg">
                                         <SelectValue placeholder="Select status" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent className="border border-border shadow-classic-lg rounded-lg">
                                         {Object.entries(STATUS_LABELS).map(([status, label]) => (
-                                            <SelectItem key={status} value={status}>
+                                            <SelectItem key={status} value={status} className="rounded-md">
                                                 {label}
                                             </SelectItem>
                                         ))}
@@ -357,13 +360,14 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="sku">
+                                <Label htmlFor="sku" className="text-sm font-semibold">
                                     SKU <span className="text-destructive">*</span>
                                 </Label>
                                 <Input
                                     id="sku"
                                     {...register('sku', { required: 'SKU is required' })}
                                     placeholder="Enter SKU"
+                                    className="h-11 border border-border rounded-lg"
                                 />
                                 {errors.sku && (
                                     <p className="text-sm text-destructive">{errors.sku.message}</p>
@@ -371,7 +375,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                             </div>
 
                             <div className="grid gap-2">
-                                <Label htmlFor="ordering">Ordering</Label>
+                                <Label htmlFor="ordering" className="text-sm font-semibold">Ordering</Label>
                                 <Input
                                     id="ordering"
                                     type="number"
@@ -379,6 +383,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                         min: { value: 0, message: 'Ordering cannot be negative' },
                                     })}
                                     placeholder="0"
+                                    className="h-11 border border-border rounded-lg"
                                 />
                                 {errors.ordering && (
                                     <p className="text-sm text-destructive">{errors.ordering.message}</p>
@@ -387,17 +392,22 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                         </div>
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="gap-2">
                         <Button
                             type="button"
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                             disabled={isLoading}
+                            className="h-11 px-6 rounded-lg"
                         >
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={isLoading}>
-                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Button
+                            type="submit"
+                            disabled={isLoading}
+                            className="h-11 px-6 rounded-lg shadow-classic-md"
+                        >
+                            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
                             {isEditing ? 'Update Product' : 'Create Product'}
                         </Button>
                     </DialogFooter>

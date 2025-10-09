@@ -45,7 +45,6 @@ export default function DeleteProductDialog({
         }
     };
 
-    // Focus cancel button when dialog opens
     useEffect(() => {
         if (open && cancelButtonRef.current) {
             setTimeout(() => {
@@ -56,27 +55,28 @@ export default function DeleteProductDialog({
 
     return (
         <AlertDialog open={open} onOpenChange={onOpenChange}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This will permanently delete the product <strong>"{product?.name}"</strong>. This action cannot be
+            <AlertDialogContent className="modal-solid-bg border border-destructive shadow-classic-xl rounded-lg">
+                <AlertDialogHeader className="space-y-3">
+                    <AlertDialogTitle className="text-2xl font-semibold">Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription className="text-base">
+                        This will permanently delete the product <strong className="text-foreground">"{product?.name}"</strong>. This action cannot be
                         undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogFooter>
+                <AlertDialogFooter className="gap-2">
                     <AlertDialogCancel
                         disabled={deleteMutation.isPending}
                         ref={cancelButtonRef}
+                        className="h-11 px-6 rounded-lg"
                     >
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
                         onClick={handleDelete}
                         disabled={deleteMutation.isPending}
-                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        className="h-11 px-6 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-classic-md"
                     >
-                        {deleteMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {deleteMutation.isPending && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>

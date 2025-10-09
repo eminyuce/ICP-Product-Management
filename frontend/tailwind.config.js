@@ -16,63 +16,63 @@ export default {
         },
         extend: {
             colors: {
-                border: 'oklch(var(--border))',
-                input: 'oklch(var(--input))',
-                ring: 'oklch(var(--ring))',
-                background: 'oklch(var(--background))',
-                foreground: 'oklch(var(--foreground))',
+                border: 'var(--border)',
+                input: 'var(--input)',
+                ring: 'var(--ring)',
+                background: 'var(--background)',
+                foreground: 'var(--foreground)',
                 primary: {
-                    DEFAULT: 'oklch(var(--primary))',
-                    foreground: 'oklch(var(--primary-foreground))'
+                    DEFAULT: 'var(--primary)',
+                    foreground: 'var(--primary-foreground)'
                 },
                 secondary: {
-                    DEFAULT: 'oklch(var(--secondary))',
-                    foreground: 'oklch(var(--secondary-foreground))'
+                    DEFAULT: 'var(--secondary)',
+                    foreground: 'var(--secondary-foreground)'
                 },
                 destructive: {
-                    DEFAULT: 'oklch(var(--destructive))',
-                    foreground: 'oklch(var(--destructive-foreground))'
+                    DEFAULT: 'var(--destructive)',
+                    foreground: 'var(--destructive-foreground)'
                 },
                 success: {
-                    DEFAULT: 'oklch(var(--success))',
-                    foreground: 'oklch(var(--success-foreground))'
+                    DEFAULT: 'var(--success)',
+                    foreground: 'var(--success-foreground)'
                 },
                 warning: {
-                    DEFAULT: 'oklch(var(--warning))',
-                    foreground: 'oklch(var(--warning-foreground))'
+                    DEFAULT: 'var(--warning)',
+                    foreground: 'var(--warning-foreground)'
                 },
                 muted: {
-                    DEFAULT: 'oklch(var(--muted))',
-                    foreground: 'oklch(var(--muted-foreground))'
+                    DEFAULT: 'var(--muted)',
+                    foreground: 'var(--muted-foreground)'
                 },
                 accent: {
-                    DEFAULT: 'oklch(var(--accent))',
-                    foreground: 'oklch(var(--accent-foreground))'
+                    DEFAULT: 'var(--accent)',
+                    foreground: 'var(--accent-foreground)'
                 },
                 popover: {
-                    DEFAULT: 'oklch(var(--popover))',
-                    foreground: 'oklch(var(--popover-foreground))'
+                    DEFAULT: 'var(--popover)',
+                    foreground: 'var(--popover-foreground)'
                 },
                 card: {
-                    DEFAULT: 'oklch(var(--card))',
-                    foreground: 'oklch(var(--card-foreground))'
+                    DEFAULT: 'var(--card)',
+                    foreground: 'var(--card-foreground)'
                 },
                 chart: {
-                    1: 'oklch(var(--chart-1))',
-                    2: 'oklch(var(--chart-2))',
-                    3: 'oklch(var(--chart-3))',
-                    4: 'oklch(var(--chart-4))',
-                    5: 'oklch(var(--chart-5))'
+                    1: 'var(--chart-1)',
+                    2: 'var(--chart-2)',
+                    3: 'var(--chart-3)',
+                    4: 'var(--chart-4)',
+                    5: 'var(--chart-5)'
                 },
                 sidebar: {
-                    DEFAULT: 'oklch(var(--sidebar))',
-                    foreground: 'oklch(var(--sidebar-foreground))',
-                    primary: 'oklch(var(--sidebar-primary))',
-                    'primary-foreground': 'oklch(var(--sidebar-primary-foreground))',
-                    accent: 'oklch(var(--sidebar-accent))',
-                    'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
-                    border: 'oklch(var(--sidebar-border))',
-                    ring: 'oklch(var(--sidebar-ring))'
+                    DEFAULT: 'var(--sidebar)',
+                    foreground: 'var(--sidebar-foreground)',
+                    primary: 'var(--sidebar-primary)',
+                    'primary-foreground': 'var(--sidebar-primary-foreground)',
+                    accent: 'var(--sidebar-accent)',
+                    'accent-foreground': 'var(--sidebar-accent-foreground)',
+                    border: 'var(--sidebar-border)',
+                    ring: 'var(--sidebar-ring)'
                 }
             },
             borderRadius: {
@@ -94,6 +94,12 @@ export default {
                 'tighter': '-0.02em',
                 'tight': '-0.01em',
             },
+            boxShadow: {
+                'classic': '0 2px 4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06)',
+                'classic-md': '0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06)',
+                'classic-lg': '0 8px 16px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08)',
+                'classic-xl': '0 12px 24px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.1)',
+            },
             keyframes: {
                 'accordion-down': {
                     from: { height: '0' },
@@ -110,13 +116,23 @@ export default {
                 'slide-in': {
                     from: { transform: 'translateY(-10px)', opacity: '0' },
                     to: { transform: 'translateY(0)', opacity: '1' }
+                },
+                'slide-up': {
+                    from: { transform: 'translateY(10px)', opacity: '0' },
+                    to: { transform: 'translateY(0)', opacity: '1' }
+                },
+                'scale-in': {
+                    from: { transform: 'scale(0.95)', opacity: '0' },
+                    to: { transform: 'scale(1)', opacity: '1' }
                 }
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
                 'accordion-up': 'accordion-up 0.2s ease-out',
                 'fade-in': 'fade-in 0.3s ease-out',
-                'slide-in': 'slide-in 0.3s ease-out'
+                'slide-in': 'slide-in 0.3s ease-out',
+                'slide-up': 'slide-up 0.3s ease-out',
+                'scale-in': 'scale-in 0.2s ease-out'
             },
             maxWidth: {
                 'container': '85%'

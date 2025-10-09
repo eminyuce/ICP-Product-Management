@@ -92,9 +92,9 @@ export default function ManageColumnsDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px] bg-background border-border">
+            <DialogContent className="sm:max-w-[500px] modal-solid-bg border border-border shadow-classic-xl rounded-lg">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+                    <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
                         <Settings className="h-5 w-5" />
                         Manage Columns
                     </DialogTitle>
@@ -110,6 +110,7 @@ export default function ManageColumnsDialog({
                             variant="outline"
                             size="sm"
                             onClick={handleSelectAll}
+                            className="rounded-md"
                         >
                             Select All
                         </Button>
@@ -118,6 +119,7 @@ export default function ManageColumnsDialog({
                             variant="outline"
                             size="sm"
                             onClick={handleDeselectAll}
+                            className="rounded-md"
                         >
                             Deselect All
                         </Button>
@@ -142,11 +144,11 @@ export default function ManageColumnsDialog({
                     </div>
                 </div>
 
-                <DialogFooter>
-                    <Button type="button" variant="outline" onClick={handleCancel}>
+                <DialogFooter className="gap-2">
+                    <Button type="button" variant="outline" onClick={handleCancel} className="rounded-lg">
                         Cancel
                     </Button>
-                    <Button type="button" onClick={handleApply}>
+                    <Button type="button" onClick={handleApply} className="rounded-lg shadow-classic">
                         Apply
                     </Button>
                 </DialogFooter>

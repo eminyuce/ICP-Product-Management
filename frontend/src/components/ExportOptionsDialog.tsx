@@ -36,9 +36,9 @@ export default function ExportOptionsDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[450px] bg-background border-border">
+            <DialogContent className="sm:max-w-[450px] modal-solid-bg border border-border shadow-classic-xl rounded-lg">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+                    <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
                         <Download className="h-5 w-5" />
                         Export Options
                     </DialogTitle>
@@ -72,11 +72,11 @@ export default function ExportOptionsDialog({
                     </RadioGroup>
                 </div>
 
-                <DialogFooter>
-                    <Button type="button" variant="outline" onClick={handleCancel}>
+                <DialogFooter className="gap-2">
+                    <Button type="button" variant="outline" onClick={handleCancel} className="rounded-lg">
                         Cancel
                     </Button>
-                    <Button type="button" onClick={handleExport} className="gap-2">
+                    <Button type="button" onClick={handleExport} className="gap-2 rounded-lg shadow-classic">
                         <Download className="h-4 w-4" />
                         Export
                     </Button>
