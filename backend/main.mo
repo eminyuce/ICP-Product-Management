@@ -1,4 +1,5 @@
 import OrderedMap "mo:base/OrderedMap";
+import BlobStorage "blob-storage/Mixin";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 import Time "mo:base/Time";
@@ -171,19 +172,7 @@ actor ProductManager {
     let sorted = Array.sort<Product>(
       filtered,
       func(a : Product, b : Product) : { #less; #equal; #greater } {
-        let order = if (sortOrder == "desc") { #greater } else { #less };
-        switch (sortBy) {
-          case ("name") { if (a.name < b.name) order else if (a.name > b.name) { if (order == #less) #greater else #less } else #equal };
-          case ("price") { if (a.price < b.price) order else if (a.price > b.price) { if (order == #less) #greater else #less } else #equal };
-          case ("quantity") { if (a.quantity < b.quantity) order else if (a.quantity > b.quantity) { if (order == #less) #greater else #less } else #equal };
-          case ("category") { if (a.category < b.category) order else if (a.category > b.category) { if (order == #less) #greater else #less } else #equal };
-          case ("sku") { if (a.sku < b.sku) order else if (a.sku > b.sku) { if (order == #less) #greater else #less } else #equal };
-          case ("status") { if (a.status < b.status) order else if (a.status > b.status) { if (order == #less) #greater else #less } else #equal };
-          case ("ordering") { if (a.ordering < b.ordering) order else if (a.ordering > b.ordering) { if (order == #less) #greater else #less } else #equal };
-          case ("created_at") { if (a.created_at < b.created_at) order else if (a.created_at > b.created_at) { if (order == #less) #greater else #less } else #equal };
-          case ("updated_at") { if (a.updated_at < b.updated_at) order else if (a.updated_at > b.updated_at) { if (order == #less) #greater else #less } else #equal };
-          case (_) { if (a.id < b.id) order else if (a.id > b.id) { if (order == #less) #greater else #less } else #equal };
-        };
+        if (a.ordering < b.ordering) #less else if (a.ordering > b.ordering) #greater else #equal;
       },
     );
 
@@ -391,5 +380,6 @@ actor ProductManager {
   public shared ({ caller }) func dropFileReference(path : Text) : async () {
     Registry.remove(registry, path);
   };
-};
 
+  include BlobStorage(registry);
+};
