@@ -1,4 +1,6 @@
 import { backendInterface, FileReference } from '../backend';
+import { HttpAgent, isV3ResponseBody } from '@dfinity/agent';
+import { IDL } from '@dfinity/candid';
 
 type Headers = Record<string, string>;
 
@@ -375,7 +377,7 @@ class StorageGatewayClient {
         numBlobBytes: number,
         owner: string,
         projectId: string,
-        httpHeaders: Headers
+        certificateBytes: Uint8Array
     ): Promise<void> {
         // Validate all hashes in the tree before sending to server (validation errors should not be retried)
         const treeJSON = blobHashTree.toJSON();
@@ -392,7 +394,10 @@ class StorageGatewayClient {
                 num_blob_bytes: numBlobBytes,
                 owner: owner,
                 project_id: projectId,
-                headers: blobHashTree.headers
+                headers: blobHashTree.headers,
+                auth: {
+                    OwnerEgressSignature: Array.from(certificateBytes)
+                }
             };
 
             const response = await fetch(url, {
@@ -424,10 +429,25 @@ export class StorageClient {
         private readonly actor: backendInterface,
         private readonly bucket: string,
         storageGatewayUrl: string,
-        private readonly owner: string,
-        private readonly projectId: string
+        private readonly backendCanisterId: string,
+        private readonly projectId: string,
+        private readonly agent: HttpAgent
     ) {
         this.storageGatewayClient = new StorageGatewayClient(storageGatewayUrl);
+    }
+
+    private async getCertificate(hash: string): Promise<Uint8Array> {
+        const args = IDL.encode([IDL.Text], [hash]);
+        const result = await this.agent.call(this.backendCanisterId, {
+            methodName: '_caffeineStorageCreateCertificate',
+            arg: args
+        });
+        const respone = result.response.body;
+        if (isV3ResponseBody(respone)) {
+            console.log('Certificate:', respone.certificate);
+            return respone.certificate;
+        }
+        throw new Error('Expected v3 response body');
     }
 
     public async putFile(
@@ -455,24 +475,26 @@ export class StorageClient {
         };
 
         const { chunks, chunkHashes, blobHashTree } = await this.processFileForUpload(file, fileHeaders);
+        const blobRootHash = blobHashTree.tree.hash;
+        const hashString = blobRootHash.toShaString();
+
+        const certificateBytes = await this.getCertificate(hashString);
+
         await this.storageGatewayClient.uploadBlobTree(
             blobHashTree,
             this.bucket,
             file.size,
-            this.owner,
+            this.backendCanisterId,
             this.projectId,
-            httpHeaders
+            certificateBytes
         );
-        const blobRootHash = blobHashTree.tree.hash;
         await this.parallelUpload(chunks, chunkHashes, blobRootHash, httpHeaders, onProgress);
-        const hash = blobRootHash.toShaString();
-
         // Validate hash format before storing in backend
-        validateHashFormat(hash, `putFile '${path}' hash storage`);
+        validateHashFormat(hashString, `putFile '${hashString}' hash storage`);
 
-        await this.actor.registerFileReference(path, hash);
+        await this.actor.registerFileReference(path, hashString);
         const url = await this.getDirectURL(path);
-        return { path, hash, url };
+        return { path, hash: hashString, url };
     }
 
     public async listObjects(): Promise<FileReference[]> {
@@ -488,7 +510,7 @@ export class StorageClient {
         // Validate hash format received from backend
         validateHashFormat(fileReference.hash, `getDirectURL for path '${path}'`);
 
-        return `${this.storageGatewayClient.getStorageGatewayUrl()}/${GATEWAY_VERSION}/blob/?blob_hash=${encodeURIComponent(fileReference.hash)}&owner_id=${encodeURIComponent(this.owner)}&project_id=${encodeURIComponent(this.projectId)}`;
+        return `${this.storageGatewayClient.getStorageGatewayUrl()}/${GATEWAY_VERSION}/blob/?blob_hash=${encodeURIComponent(fileReference.hash)}&owner_id=${encodeURIComponent(this.backendCanisterId)}&project_id=${encodeURIComponent(this.projectId)}`;
     }
 
     private async processFileForUpload(
@@ -527,7 +549,7 @@ export class StorageClient {
                 chunkIndex: index,
                 chunkData,
                 bucketName: this.bucket,
-                owner: this.owner,
+                owner: this.backendCanisterId,
                 projectId: this.projectId,
                 httpHeaders
             });

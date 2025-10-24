@@ -37,14 +37,14 @@ module {
     public func add(registry : Registry, path : Text, hash : Text) {
         let pathMap = OrderedMap.Make<Text>(Text.compare);
         let fileReference = { path; hash };
-
+        
         // Add the file reference to the registry
         registry.references := pathMap.put(registry.references, path, fileReference);
     };
 
     public func get(registry : Registry, path : Text) : FileReference {
         let pathMap = OrderedMap.Make<Text>(Text.compare);
-
+        
         // Get the file reference directly
         switch (pathMap.get(registry.references, path)) {
             case null Debug.trap("Inexistent file reference");
@@ -54,7 +54,7 @@ module {
 
     public func list(registry : Registry) : [FileReference] {
         let pathMap = OrderedMap.Make<Text>(Text.compare);
-
+        
         // Return all file references
         Iter.toArray(pathMap.vals(registry.references));
     };
@@ -62,14 +62,14 @@ module {
     public func remove(registry : Registry, path : Text) {
         let pathMap = OrderedMap.Make<Text>(Text.compare);
         let hashMap = OrderedMap.Make<Text>(Text.compare);
-
+        
         // Get the file reference to extract the hash before removing
         switch (pathMap.get(registry.references, path)) {
             case null { /* File doesn't exist, nothing to remove */ };
             case (?fileReference) {
                 // Add the hash to the blobsToRemove map
                 registry.blobsToRemove := hashMap.put(registry.blobsToRemove, fileReference.hash, true);
-
+                
                 // Remove the file from the registry
                 registry.references := pathMap.remove(registry.references, path).0;
             };
@@ -85,7 +85,7 @@ module {
         let hashMap = OrderedMap.Make<Text>(Text.compare);
         var updatedBlobsToRemove = registry.blobsToRemove;
         var clearedCount : Nat = 0;
-
+        
         for (hash in hashesToClear.vals()) {
             let (newMap, removed) = hashMap.remove(updatedBlobsToRemove, hash);
             updatedBlobsToRemove := newMap;
@@ -93,7 +93,7 @@ module {
                 clearedCount += 1;
             };
         };
-
+        
         registry.blobsToRemove := updatedBlobsToRemove;
         clearedCount;
     };
@@ -114,11 +114,11 @@ module {
         let cashierActor = actor(Principal.toText(await getCashierPrincipal())) : actor {
             storage_gateway_principal_list_v1 : () -> async [Principal];
         };
-
+        
         registry.authorizedPrincipals := await cashierActor.storage_gateway_principal_list_v1();
         };
 
-    public func isAuthorized(registry : Registry, caller : Principal) : Bool {
+    public func isAuthorized(registry : Registry, caller : Principal) : Bool {        
         let authorized = Array.find<Principal>(registry.authorizedPrincipals, func (p: Principal) : Bool {
             Principal.equal(p, caller)
         }) != null;
@@ -133,9 +133,9 @@ module {
     }  {
         let currentBalance = Cycles.balance();
         let reservedCycles : Nat = 400_000_000_000;
-
+        
         let currentFreeCyclesCount : Nat = Nat.sub(currentBalance, reservedCycles);
-
+        
         let cyclesToSend : Nat = switch (refillInformation) {
             case null { currentFreeCyclesCount };
             case (?info) {
@@ -150,13 +150,13 @@ module {
             account_top_up_v1 : ({ account : Principal }) -> async ();
         };
 
-
+        
         await (with cycles = cyclesToSend) targetCanister.account_top_up_v1({ account = Prim.getSelfPrincipal<system>() });
-
+        
         {
             success = ?true;
             topped_up_amount = ?cyclesToSend;
         };
     };
-
+    
 };

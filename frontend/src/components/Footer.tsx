@@ -8,9 +8,9 @@ export default function Footer() {
                     © 2025. Built with{' '}
                     <Heart className="inline h-4 w-4 fill-destructive text-destructive" />{' '}
                     using{' '}
-                    <a
-                        href="https://caffeine.ai"
-                        target="_blank"
+                    <a 
+                        href="https://caffeine.ai" 
+                        target="_blank" 
                         rel="noopener noreferrer"
                         className="font-semibold text-primary hover:text-accent transition-colors underline"
                     >

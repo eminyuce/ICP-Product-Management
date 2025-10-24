@@ -65,6 +65,7 @@ const DEFAULT_COLUMN_VISIBILITY: ColumnVisibility = {
     sku: true,
     status: true,
     ordering: true,
+    discount: true,
     created_at: true,
     updated_at: true,
 };
@@ -88,7 +89,7 @@ export default function ProductTable() {
     const [tempFilters, setTempFilters] = useState<ProductFilters>(filters);
     const [globalSearch, setGlobalSearch] = useState('');
     const [showFilters, setShowFilters] = useState(false);
-    const [sortBy, setSortBy] = useState<SortField>('id');
+    const [sortBy, setSortBy] = useState<SortField>('ordering');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
@@ -120,12 +121,12 @@ export default function ProductTable() {
     };
 
     const handleClearFilters = () => {
-        const emptyFilters: ProductFilters = {
-            name: '',
-            category: '',
-            sku: '',
-            status: '',
-            ordering: '',
+        const emptyFilters: ProductFilters = { 
+            name: '', 
+            category: '', 
+            sku: '', 
+            status: '', 
+            ordering: '', 
             search: '',
             createdFrom: '',
             createdTo: '',
@@ -240,9 +241,9 @@ export default function ProductTable() {
     const handleStatusChange = async (productId: bigint, newStatus: string) => {
         try {
             const statusValue = BigInt(parseInt(newStatus));
-            await updateFieldsMutation.mutateAsync({
-                id: productId,
-                fields: { status: statusValue }
+            await updateFieldsMutation.mutateAsync({ 
+                id: productId, 
+                fields: { status: statusValue } 
             });
             toast.success('Status updated successfully');
             setEditingCell(null);
@@ -284,6 +285,16 @@ export default function ProductTable() {
         }
     };
 
+    const formatDiscountDisplay = (product: Product): string => {
+        if (!product.discount) return '—';
+        
+        if (product.discount.discountType === 'percentage') {
+            return `${product.discount.value}% off`;
+        } else {
+            return `$${product.discount.value.toFixed(2)} off`;
+        }
+    };
+
     const handleExport = (exportType: 'all' | 'visible') => {
         if (products.length === 0) {
             toast.error('No data to export');
@@ -299,12 +310,13 @@ export default function ProductTable() {
             { key: 'quantity', label: 'Quantity', visible: columnVisibility.quantity },
             { key: 'status', label: 'Status', visible: columnVisibility.status },
             { key: 'ordering', label: 'Ordering', visible: columnVisibility.ordering },
+            { key: 'discount', label: 'Discount', visible: columnVisibility.discount },
             { key: 'created_at', label: 'Created', visible: columnVisibility.created_at },
             { key: 'updated_at', label: 'Updated', visible: columnVisibility.updated_at },
         ];
 
-        const columnsToExport = exportType === 'all'
-            ? allColumns
+        const columnsToExport = exportType === 'all' 
+            ? allColumns 
             : allColumns.filter(col => col.visible);
 
         if (columnsToExport.length === 0) {
@@ -332,6 +344,8 @@ export default function ProductTable() {
                         return getStatusLabel(Number(p.status));
                     case 'ordering':
                         return Number(p.ordering);
+                    case 'discount':
+                        return formatDiscountDisplay(p);
                     case 'created_at':
                         return formatTimestamp(p.created_at);
                     case 'updated_at':
@@ -385,19 +399,19 @@ export default function ProductTable() {
         if (filters.createdFrom || filters.createdTo) {
             const fromDate = filters.createdFrom ? format(new Date(filters.createdFrom), 'MMM d, yyyy') : '...';
             const toDate = filters.createdTo ? format(new Date(filters.createdTo), 'MMM d, yyyy') : '...';
-            activeFilters.push({
-                key: 'createdFrom',
-                label: 'Created Date',
-                value: `${fromDate} - ${toDate}`
+            activeFilters.push({ 
+                key: 'createdFrom', 
+                label: 'Created Date', 
+                value: `${fromDate} - ${toDate}` 
             });
         }
         if (filters.updatedFrom || filters.updatedTo) {
             const fromDate = filters.updatedFrom ? format(new Date(filters.updatedFrom), 'MMM d, yyyy') : '...';
             const toDate = filters.updatedTo ? format(new Date(filters.updatedTo), 'MMM d, yyyy') : '...';
-            activeFilters.push({
-                key: 'updatedFrom',
-                label: 'Updated Date',
-                value: `${fromDate} - ${toDate}`
+            activeFilters.push({ 
+                key: 'updatedFrom', 
+                label: 'Updated Date', 
+                value: `${fromDate} - ${toDate}` 
             });
         }
 
@@ -838,7 +852,7 @@ export default function ProductTable() {
                                     />
                                 </div>
                             </div>
-
+                            
                             <div className="space-y-4 pt-3">
                                 <h4 className="text-base font-semibold">Date Range Filters</h4>
                                 <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -1035,6 +1049,11 @@ export default function ProductTable() {
                                                     </Button>
                                                 </TableHead>
                                             )}
+                                            {columnVisibility.discount && (
+                                                <TableHead className="text-center">
+                                                    <span className="font-semibold">Discount</span>
+                                                </TableHead>
+                                            )}
                                             {columnVisibility.created_at && (
                                                 <TableHead>
                                                     <Button
@@ -1068,7 +1087,7 @@ export default function ProductTable() {
                                         {products.map((product) => {
                                             const isSelected = selectedIds.has(product.id);
                                             return (
-                                                <TableRow
+                                                <TableRow 
                                                     key={Number(product.id)}
                                                     className={`border-b border-border transition-colors ${isSelected ? 'bg-secondary' : 'hover:bg-muted'}`}
                                                 >
@@ -1089,7 +1108,7 @@ export default function ProductTable() {
                                                     {columnVisibility.name && (
                                                         <TableCell>
                                                             <Link
-                                                                to="/product/$productId"
+                                                                to="/admin/product/$productId"
                                                                 params={{ productId: product.id.toString() }}
                                                                 className="font-semibold text-primary hover:text-accent transition-colors underline"
                                                             >
@@ -1236,6 +1255,17 @@ export default function ProductTable() {
                                                             )}
                                                         </TableCell>
                                                     )}
+                                                    {columnVisibility.discount && (
+                                                        <TableCell className="text-center">
+                                                            {product.discount ? (
+                                                                <Badge variant="secondary" className="rounded-md font-semibold">
+                                                                    {formatDiscountDisplay(product)}
+                                                                </Badge>
+                                                            ) : (
+                                                                <span className="text-muted-foreground">—</span>
+                                                            )}
+                                                        </TableCell>
+                                                    )}
                                                     {columnVisibility.created_at && (
                                                         <TableCell className="text-sm text-muted-foreground">
                                                             {formatTimestamp(product.created_at)}
@@ -1251,7 +1281,7 @@ export default function ProductTable() {
                                                             <Button
                                                                 variant="ghost"
                                                                 size="icon"
-                                                                onClick={() => navigate({ to: '/product/$productId', params: { productId: product.id.toString() } })}
+                                                                onClick={() => navigate({ to: '/admin/product/$productId', params: { productId: product.id.toString() } })}
                                                                 title="View Details"
                                                                 className="rounded-md hover:bg-accent/20 transition-all"
                                                             >

@@ -21,11 +21,11 @@ interface DeleteProductDialogProps {
     onDeleteSuccess?: () => void;
 }
 
-export default function DeleteProductDialog({
-    open,
-    onOpenChange,
+export default function DeleteProductDialog({ 
+    open, 
+    onOpenChange, 
     product,
-    onDeleteSuccess
+    onDeleteSuccess 
 }: DeleteProductDialogProps) {
     const deleteMutation = useDeleteProduct();
     const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -64,7 +64,7 @@ export default function DeleteProductDialog({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="gap-2">
-                    <AlertDialogCancel
+                    <AlertDialogCancel 
                         disabled={deleteMutation.isPending}
                         ref={cancelButtonRef}
                         className="h-11 px-6 rounded-lg"

@@ -21,7 +21,7 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { useCreateProduct, useUpdateProduct } from '@/hooks/useQueries';
-import type { Product, ProductInput } from '@/backend';
+import type { Product, ProductInput, DiscountType } from '@/backend';
 import { toast } from 'sonner';
 import { STATUS_LABELS } from '@/lib/statusLabels';
 
@@ -40,6 +40,8 @@ interface FormData {
     sku: string;
     status: string;
     ordering: string;
+    discountType: string;
+    discountValue: string;
 }
 
 export default function ProductDialog({ open, onOpenChange, product }: ProductDialogProps) {
@@ -49,6 +51,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fileError, setFileError] = useState<string | null>(null);
+    const [hasDiscount, setHasDiscount] = useState(false);
 
     const {
         register,
@@ -68,16 +71,23 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
             sku: '',
             status: '0',
             ordering: '0',
+            discountType: 'percentage',
+            discountValue: '',
         },
     });
 
     const statusValue = watch('status');
+    const discountTypeValue = watch('discountType');
+    const discountValueInput = watch('discountValue');
 
     // Reset form when dialog opens or product changes
     useEffect(() => {
         if (open) {
             if (product) {
                 // Editing mode - populate with product data
+                const hasProductDiscount = !!product.discount;
+                setHasDiscount(hasProductDiscount);
+                
                 reset({
                     name: product.name,
                     description: product.description,
@@ -87,9 +97,12 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                     sku: product.sku,
                     status: Number(product.status).toString(),
                     ordering: Number(product.ordering).toString(),
+                    discountType: product.discount?.discountType || 'percentage',
+                    discountValue: product.discount?.value.toString() || '',
                 });
             } else {
                 // Creation mode - reset to empty values
+                setHasDiscount(false);
                 reset({
                     name: '',
                     description: '',
@@ -99,6 +112,8 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                     sku: '',
                     status: '0',
                     ordering: '0',
+                    discountType: 'percentage',
+                    discountValue: '',
                 });
             }
             // Clear file selection when dialog opens
@@ -163,6 +178,27 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
             ordering: BigInt(parseInt(data.ordering)),
         };
 
+        // Add discount if enabled and value is provided
+        if (hasDiscount && data.discountValue && parseFloat(data.discountValue) > 0) {
+            const discountValue = parseFloat(data.discountValue);
+            
+            // Validate discount value based on type
+            if (data.discountType === 'percentage' && (discountValue < 0 || discountValue > 100)) {
+                toast.error('Percentage discount must be between 0 and 100');
+                return;
+            }
+            
+            if (data.discountType === 'currency' && discountValue < 0) {
+                toast.error('Currency discount must be a positive number');
+                return;
+            }
+
+            input.discount = {
+                discountType: data.discountType as DiscountType,
+                value: discountValue,
+            };
+        }
+
         try {
             if (isEditing) {
                 await updateMutation.mutateAsync({ id: product.id, input, imageFile: selectedFile || undefined });
@@ -181,7 +217,7 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent
+            <DialogContent 
                 className="sm:max-w-[750px] max-h-[90vh] overflow-y-auto modal-solid-bg border border-border shadow-classic-xl rounded-lg"
             >
                 <DialogHeader className="space-y-3">
@@ -388,6 +424,75 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                                 )}
                             </div>
                         </div>
+
+                        {/* Discount Section */}
+                        <div className="border-t border-border pt-5 mt-2">
+                            <div className="flex items-center justify-between mb-4">
+                                <Label className="text-base font-semibold">Discount (Optional)</Label>
+                                <Button
+                                    type="button"
+                                    variant={hasDiscount ? "default" : "outline"}
+                                    size="sm"
+                                    onClick={() => setHasDiscount(!hasDiscount)}
+                                    className="rounded-md"
+                                >
+                                    {hasDiscount ? 'Remove Discount' : 'Add Discount'}
+                                </Button>
+                            </div>
+
+                            {hasDiscount && (
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="discountType" className="text-sm font-semibold">
+                                            Discount Type
+                                        </Label>
+                                        <Select
+                                            value={discountTypeValue}
+                                            onValueChange={(value) => setValue('discountType', value)}
+                                        >
+                                            <SelectTrigger id="discountType" className="h-11 border border-border rounded-lg">
+                                                <SelectValue placeholder="Select type" />
+                                            </SelectTrigger>
+                                            <SelectContent className="border border-border shadow-classic-lg rounded-lg">
+                                                <SelectItem value="percentage" className="rounded-md">
+                                                    Percentage (%)
+                                                </SelectItem>
+                                                <SelectItem value="currency" className="rounded-md">
+                                                    Currency ($)
+                                                </SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="discountValue" className="text-sm font-semibold">
+                                            Discount Value
+                                        </Label>
+                                        <Input
+                                            id="discountValue"
+                                            type="number"
+                                            step="0.01"
+                                            {...register('discountValue', {
+                                                min: { value: 0, message: 'Discount value cannot be negative' },
+                                                max: discountTypeValue === 'percentage' 
+                                                    ? { value: 100, message: 'Percentage cannot exceed 100' }
+                                                    : undefined,
+                                            })}
+                                            placeholder={discountTypeValue === 'percentage' ? '0-100' : '0.00'}
+                                            className="h-11 border border-border rounded-lg"
+                                        />
+                                        {errors.discountValue && (
+                                            <p className="text-sm text-destructive">{errors.discountValue.message}</p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground">
+                                            {discountTypeValue === 'percentage' 
+                                                ? 'Enter a percentage between 0 and 100'
+                                                : 'Enter a dollar amount'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
 
                     <DialogFooter className="gap-2">
@@ -400,8 +505,8 @@ export default function ProductDialog({ open, onOpenChange, product }: ProductDi
                         >
                             Cancel
                         </Button>
-                        <Button
-                            type="submit"
+                        <Button 
+                            type="submit" 
                             disabled={isLoading}
                             className="h-11 px-6 rounded-lg shadow-classic-md"
                         >

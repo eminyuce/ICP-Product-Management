@@ -9,16 +9,37 @@ import Int "mo:base/Int";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Registry "blob-storage/registry";
+import Stripe "stripe/stripe";
+import OutCall "http-outcalls/outcall";
+import AccessControl "authorization/access-control";
+import Principal "mo:base/Principal";
 
 actor ProductManager {
   transient let natMap = OrderedMap.Make<Nat>(Nat.compare);
   transient let textMap = OrderedMap.Make<Text>(Text.compare);
+  transient let principalMap = OrderedMap.Make<Principal>(Principal.compare);
 
   var products : OrderedMap.Map<Nat, Product> = natMap.empty<Product>();
   var skuIndex : OrderedMap.Map<Text, Nat> = textMap.empty<Nat>();
   var nextId : Nat = 1;
 
   let registry = Registry.new();
+
+  // Authorization state
+  let accessControlState = AccessControl.initState();
+
+  // Stripe configuration
+  var stripeConfig : ?Stripe.StripeConfiguration = null;
+
+  public type DiscountType = {
+    #percentage;
+    #currency;
+  };
+
+  public type Discount = {
+    discountType : DiscountType;
+    value : Float;
+  };
 
   public type Product = {
     id : Nat;
@@ -31,8 +52,11 @@ actor ProductManager {
     status : Nat;
     ordering : Int;
     imagePath : ?Text;
+    discount : ?Discount;
     created_at : Int;
     updated_at : Int;
+    createdBy : Principal;
+    updatedBy : Principal;
   };
 
   public type ProductInput = {
@@ -45,6 +69,7 @@ actor ProductManager {
     status : Nat;
     ordering : Int;
     imagePath : ?Text;
+    discount : ?Discount;
   };
 
   public type ProductPage = {
@@ -66,14 +91,102 @@ actor ProductManager {
     quantity : ?Int;
     status : ?Nat;
     ordering : ?Int;
+    discount : ?Discount;
   };
 
-  public func createProduct(input : ProductInput) : async Product {
+  public type ShoppingCartItem = {
+    productId : Nat;
+    quantity : Int;
+  };
+
+  public type OrderItem = {
+    productId : Nat;
+    quantity : Int;
+    price : Float;
+    discount : ?Discount;
+  };
+
+  public type OrderStatus = {
+    #pending;
+    #paid;
+    #shipped;
+    #delivered;
+    #cancelled;
+  };
+
+  public type Order = {
+    id : Nat;
+    items : [OrderItem];
+    totalAmount : Float;
+    status : OrderStatus;
+    created_at : Int;
+    updated_at : Int;
+    paymentIntentId : ?Text;
+  };
+
+  public type OrderInput = {
+    items : [OrderItem];
+    totalAmount : Float;
+    paymentIntentId : ?Text;
+  };
+
+  public type OrderPage = {
+    orders : [Order];
+    totalCount : Nat;
+    currentPage : Nat;
+    totalPages : Nat;
+    hasNextPage : Bool;
+    hasPreviousPage : Bool;
+  };
+
+  var orders : OrderedMap.Map<Nat, Order> = natMap.empty<Order>();
+  var nextOrderId : Nat = 1;
+
+  public type UserProfile = {
+    name : Text;
+    // Add other user metadata fields as needed
+  };
+
+  var userProfiles : OrderedMap.Map<Principal, UserProfile> = principalMap.empty<UserProfile>();
+
+  public shared ({ caller }) func initializeAccessControl() : async () {
+    AccessControl.initialize(accessControlState, caller);
+  };
+
+  public query ({ caller }) func getCallerUserRole() : async AccessControl.UserRole {
+    AccessControl.getUserRole(accessControlState, caller);
+  };
+
+  public shared ({ caller }) func assignCallerUserRole(user : Principal, role : AccessControl.UserRole) : async () {
+    AccessControl.assignRole(accessControlState, caller, user, role);
+  };
+
+  public query ({ caller }) func isCallerAdmin() : async Bool {
+    AccessControl.isAdmin(accessControlState, caller);
+  };
+
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    principalMap.get(userProfiles, caller);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    userProfiles := principalMap.put(userProfiles, caller, profile);
+  };
+
+  public query func getUserProfile(user : Principal) : async ?UserProfile {
+    principalMap.get(userProfiles, user);
+  };
+
+  public shared ({ caller }) func createProduct(input : ProductInput) : async Product {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can create products");
+    };
+
     if (Text.size(input.name) == 0) {
       Debug.trap("Product name is required");
     };
 
-    if (Float.equal(input.price, 0.0)) {
+    if (input.price == 0.0) {
       Debug.trap("Product price is required");
     };
 
@@ -96,8 +209,11 @@ actor ProductManager {
       status = input.status;
       ordering = input.ordering;
       imagePath = input.imagePath;
+      discount = input.discount;
       created_at = now;
       updated_at = now;
+      createdBy = caller;
+      updatedBy = caller;
     };
 
     products := natMap.put(products, id, product);
@@ -197,7 +313,11 @@ actor ProductManager {
     };
   };
 
-  public func updateProduct(id : Nat, input : ProductInput) : async Product {
+  public shared ({ caller }) func updateProduct(id : Nat, input : ProductInput) : async Product {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can update products");
+    };
+
     switch (natMap.get(products, id)) {
       case (null) { Debug.trap("Product not found") };
       case (?existing) {
@@ -205,7 +325,7 @@ actor ProductManager {
           Debug.trap("Product name is required");
         };
 
-        if (Float.equal(input.price, 0.0)) {
+        if (input.price == 0.0) {
           Debug.trap("Product price is required");
         };
 
@@ -226,8 +346,11 @@ actor ProductManager {
           status = input.status;
           ordering = input.ordering;
           imagePath = input.imagePath;
+          discount = input.discount;
           created_at = existing.created_at;
           updated_at = now;
+          createdBy = existing.createdBy;
+          updatedBy = caller;
         };
 
         products := natMap.put(products, id, updated);
@@ -242,7 +365,11 @@ actor ProductManager {
     };
   };
 
-  public func updateProductFields(id : Nat, fields : ProductUpdateFields) : async Product {
+  public shared ({ caller }) func updateProductFields(id : Nat, fields : ProductUpdateFields) : async Product {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can update product fields");
+    };
+
     switch (natMap.get(products, id)) {
       case (null) { Debug.trap("Product not found") };
       case (?existing) {
@@ -259,8 +386,11 @@ actor ProductManager {
           status = switch (fields.status) { case (null) { existing.status }; case (?s) { s } };
           ordering = switch (fields.ordering) { case (null) { existing.ordering }; case (?o) { o } };
           imagePath = existing.imagePath;
+          discount = switch (fields.discount) { case (null) { existing.discount }; case (?d) { ?d } };
           created_at = existing.created_at;
           updated_at = now;
+          createdBy = existing.createdBy;
+          updatedBy = caller;
         };
 
         products := natMap.put(products, id, updated);
@@ -269,7 +399,11 @@ actor ProductManager {
     };
   };
 
-  public func updateProductsBatch(ids : [Nat], fields : ProductUpdateFields) : async Nat {
+  public shared ({ caller }) func updateProductsBatch(ids : [Nat], fields : ProductUpdateFields) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can update products batch");
+    };
+
     var updatedCount = 0;
 
     for (id in ids.vals()) {
@@ -289,8 +423,11 @@ actor ProductManager {
             status = switch (fields.status) { case (null) { existing.status }; case (?s) { s } };
             ordering = switch (fields.ordering) { case (null) { existing.ordering }; case (?o) { o } };
             imagePath = existing.imagePath;
+            discount = switch (fields.discount) { case (null) { existing.discount }; case (?d) { ?d } };
             created_at = existing.created_at;
             updated_at = now;
+            createdBy = existing.createdBy;
+            updatedBy = caller;
           };
 
           products := natMap.put(products, id, updated);
@@ -302,7 +439,11 @@ actor ProductManager {
     updatedCount;
   };
 
-  public func deleteProduct(id : Nat) : async () {
+  public shared ({ caller }) func deleteProduct(id : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can delete products");
+    };
+
     switch (natMap.get(products, id)) {
       case (null) { Debug.trap("Product not found") };
       case (?product) {
@@ -312,7 +453,11 @@ actor ProductManager {
     };
   };
 
-  public func deleteProductsBatch(ids : [Nat]) : async BatchDeleteResult {
+  public shared ({ caller }) func deleteProductsBatch(ids : [Nat]) : async BatchDeleteResult {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can delete products batch");
+    };
+
     var deletedCount = 0;
 
     for (id in ids.vals()) {
@@ -366,20 +511,188 @@ actor ProductManager {
   };
 
   public shared ({ caller }) func registerFileReference(path : Text, hash : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can register file references");
+    };
     Registry.add(registry, path, hash);
   };
 
   public query ({ caller }) func getFileReference(path : Text) : async Registry.FileReference {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can get file references");
+    };
     Registry.get(registry, path);
   };
 
   public query ({ caller }) func listFileReferences() : async [Registry.FileReference] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can list file references");
+    };
     Registry.list(registry);
   };
 
   public shared ({ caller }) func dropFileReference(path : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can drop file references");
+    };
     Registry.remove(registry, path);
   };
 
   include BlobStorage(registry);
+
+  public shared func createOrder(input : OrderInput) : async Order {
+    let now = Time.now();
+    let id = nextOrderId;
+    nextOrderId += 1;
+
+    let order : Order = {
+      id;
+      items = input.items;
+      totalAmount = input.totalAmount;
+      status = #pending;
+      created_at = now;
+      updated_at = now;
+      paymentIntentId = input.paymentIntentId;
+    };
+
+    orders := natMap.put(orders, id, order);
+    order;
+  };
+
+  public query func getOrder(id : Nat) : async ?Order {
+    natMap.get(orders, id);
+  };
+
+  public query func getAllOrders(
+    page : Nat,
+    limit : Nat,
+    statusFilter : ?OrderStatus,
+    sortBy : Text,
+    sortOrder : Text,
+  ) : async OrderPage {
+    let allOrders = Iter.toArray(natMap.vals(orders));
+
+    let filtered = Array.filter<Order>(
+      allOrders,
+      func(o : Order) : Bool {
+        switch (statusFilter) {
+          case (null) { true };
+          case (?status) { o.status == status };
+        };
+      },
+    );
+
+    let sorted = Array.sort<Order>(
+      filtered,
+      func(a : Order, b : Order) : { #less; #equal; #greater } {
+        if (a.created_at < b.created_at) #less else if (a.created_at > b.created_at) #greater else #equal;
+      },
+    );
+
+    let totalCount = sorted.size();
+    let totalPages = if (totalCount == 0) { 1 } else {
+      (totalCount + limit - 1) / limit;
+    };
+
+    let currentPage = if (page == 0) { 1 } else if (page > totalPages) { totalPages } else { page };
+    let start = (currentPage - 1) * limit;
+    let end = if (start + limit > totalCount) { totalCount } else { start + limit };
+
+    let paged = Array.subArray(sorted, start, end - start);
+
+    {
+      orders = paged;
+      totalCount;
+      currentPage;
+      totalPages;
+      hasNextPage = currentPage < totalPages;
+      hasPreviousPage = currentPage > 1;
+    };
+  };
+
+  public shared ({ caller }) func updateOrderStatus(id : Nat, status : OrderStatus) : async Order {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can update order status");
+    };
+
+    switch (natMap.get(orders, id)) {
+      case (null) { Debug.trap("Order not found") };
+      case (?existing) {
+        let now = Time.now();
+
+        let updated : Order = {
+          id = existing.id;
+          items = existing.items;
+          totalAmount = existing.totalAmount;
+          status;
+          created_at = existing.created_at;
+          updated_at = now;
+          paymentIntentId = existing.paymentIntentId;
+        };
+
+        orders := natMap.put(orders, id, updated);
+        updated;
+      };
+    };
+  };
+
+  public shared ({ caller }) func updateOrderPaymentIntent(id : Nat, paymentIntentId : Text) : async Order {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can update order payment intent");
+    };
+
+    switch (natMap.get(orders, id)) {
+      case (null) { Debug.trap("Order not found") };
+      case (?existing) {
+        let now = Time.now();
+
+        let updated : Order = {
+          id = existing.id;
+          items = existing.items;
+          totalAmount = existing.totalAmount;
+          status = existing.status;
+          created_at = existing.created_at;
+          updated_at = now;
+          paymentIntentId = ?paymentIntentId;
+        };
+
+        orders := natMap.put(orders, id, updated);
+        updated;
+      };
+    };
+  };
+
+  public shared ({ caller }) func setStripeConfiguration(config : Stripe.StripeConfiguration) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Debug.trap("Unauthorized: Only admins can set Stripe configuration");
+    };
+    stripeConfig := ?config;
+  };
+
+  public query func isStripeConfigured() : async Bool {
+    stripeConfig != null;
+  };
+
+  public query func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
+    OutCall.transform(input);
+  };
+
+  public func getStripeSessionStatus(sessionId : Text) : async Stripe.StripeSessionStatus {
+    switch (stripeConfig) {
+      case (null) { Debug.trap("Stripe configuration not set") };
+      case (?config) {
+        await Stripe.getSessionStatus(config, sessionId, transform);
+      };
+    };
+  };
+
+  public shared ({ caller }) func createCheckoutSession(items : [Stripe.ShoppingItem], successUrl : Text, cancelUrl : Text) : async Text {
+    switch (stripeConfig) {
+      case (null) { Debug.trap("Stripe configuration not set") };
+      case (?config) {
+        await Stripe.createCheckoutSession(config, caller, items, successUrl, cancelUrl, transform);
+      };
+    };
+  };
 };
+

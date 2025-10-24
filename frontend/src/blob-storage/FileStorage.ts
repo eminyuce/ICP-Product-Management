@@ -4,6 +4,22 @@ import { useActor } from '../hooks/useActor';
 import { loadConfig } from '../config';
 import { StorageClient } from './StorageClient';
 import { FileReference } from '../backend';
+import { HttpAgent } from '@icp-sdk/core/agent';
+
+const getHttpAgent = async () => {
+    const config = await loadConfig();
+
+    const agent = new HttpAgent({
+        host: config.backend_host
+    });
+    if (config.backend_host?.includes('localhost')) {
+        await agent.fetchRootKey().catch((err) => {
+            console.warn('Unable to fetch root key. Check to ensure that your local replica is running');
+            console.error(err);
+        });
+    }
+    return agent;
+};
 
 // Hook to fetch the list of files
 export const useFileList = () => {
@@ -33,7 +49,8 @@ export const useFileUrl = (path: string) => {
             envConfig.bucket_name,
             envConfig.storage_gateway_url,
             envConfig.backend_canister_id,
-            envConfig.project_id
+            envConfig.project_id,
+            await getHttpAgent()
         );
         const url = await storageClient.getDirectURL(path);
         return url;
@@ -72,7 +89,8 @@ export const useFileUpload = () => {
             envConfig.bucket_name,
             envConfig.storage_gateway_url,
             envConfig.backend_canister_id,
-            envConfig.project_id
+            envConfig.project_id,
+            await getHttpAgent()
         );
 
         setIsUploading(true);

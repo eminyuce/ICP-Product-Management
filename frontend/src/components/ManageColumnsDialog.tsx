@@ -21,6 +21,7 @@ export interface ColumnVisibility {
     sku: boolean;
     status: boolean;
     ordering: boolean;
+    discount: boolean;
     created_at: boolean;
     updated_at: boolean;
 }
@@ -41,6 +42,7 @@ const COLUMN_LABELS: Record<keyof ColumnVisibility, string> = {
     sku: 'SKU',
     status: 'Status',
     ordering: 'Ordering',
+    discount: 'Discount',
     created_at: 'Created At',
     updated_at: 'Updated At',
 };

@@ -56,12 +56,12 @@ export default function BatchDeleteDialog({
                 <AlertDialogHeader className="space-y-3">
                     <AlertDialogTitle className="text-2xl font-semibold">Delete Multiple Products</AlertDialogTitle>
                     <AlertDialogDescription className="text-base">
-                        Are you sure you want to delete <strong className="text-foreground">{productCount}</strong> selected product{productCount !== 1 ? 's' : ''}?
+                        Are you sure you want to delete <strong className="text-foreground">{productCount}</strong> selected product{productCount !== 1 ? 's' : ''}? 
                         This action cannot be undone.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="gap-2">
-                    <AlertDialogCancel
+                    <AlertDialogCancel 
                         disabled={deleteMutation.isPending}
                         ref={cancelButtonRef}
                         className="h-11 px-6 rounded-lg"

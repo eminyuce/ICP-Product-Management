@@ -4,117 +4,117 @@
 
 @layer base {
   :root {
-    /* Classic Color Palette - Light Mode */
-    --background: #f8f9fa;
-    --foreground: #212529;
-
-    --card: #ffffff;
-    --card-foreground: #212529;
-
-    --popover: #ffffff;
-    --popover-foreground: #212529;
-
-    --primary: #4a6fa5;
-    --primary-foreground: #ffffff;
-
-    --secondary: #e9ecef;
-    --secondary-foreground: #212529;
-
-    --muted: #f1f3f5;
-    --muted-foreground: #6c757d;
-
-    --accent: #7c9cbf;
-    --accent-foreground: #ffffff;
-
-    --destructive: #c1666b;
-    --destructive-foreground: #ffffff;
-
-    --success: #6a9f7f;
-    --success-foreground: #ffffff;
-
-    --warning: #d4a574;
-    --warning-foreground: #212529;
-
-    --border: #dee2e6;
-    --input: #ffffff;
-    --ring: #4a6fa5;
-
+    /* Modern Color Palette - Light Mode */
+    --background: oklch(98% 0.01 240);
+    --foreground: oklch(20% 0.02 240);
+    
+    --card: oklch(100% 0 0);
+    --card-foreground: oklch(20% 0.02 240);
+    
+    --popover: oklch(100% 0 0);
+    --popover-foreground: oklch(20% 0.02 240);
+    
+    --primary: oklch(55% 0.15 250);
+    --primary-foreground: oklch(100% 0 0);
+    
+    --secondary: oklch(95% 0.01 240);
+    --secondary-foreground: oklch(20% 0.02 240);
+    
+    --muted: oklch(96% 0.01 240);
+    --muted-foreground: oklch(50% 0.02 240);
+    
+    --accent: oklch(65% 0.12 250);
+    --accent-foreground: oklch(100% 0 0);
+    
+    --destructive: oklch(55% 0.18 20);
+    --destructive-foreground: oklch(100% 0 0);
+    
+    --success: oklch(60% 0.15 150);
+    --success-foreground: oklch(100% 0 0);
+    
+    --warning: oklch(70% 0.15 60);
+    --warning-foreground: oklch(20% 0.02 240);
+    
+    --border: oklch(90% 0.01 240);
+    --input: oklch(100% 0 0);
+    --ring: oklch(55% 0.15 250);
+    
     --radius: 0.5rem;
-
+    
     /* Modal-specific colors for high contrast - fully opaque */
-    --modal-overlay: #212529;
-    --modal-background: #ffffff;
-    --modal-border: #ced4da;
-
+    --modal-overlay: oklch(20% 0.02 240);
+    --modal-background: oklch(100% 0 0);
+    --modal-border: oklch(85% 0.01 240);
+    
     /* Enhanced checkbox colors for high visibility */
-    --checkbox-border: #4a6fa5;
-    --checkbox-border-hover: #3a5a8a;
-    --checkbox-checked-bg: #4a6fa5;
-    --checkbox-checked-border: #3a5a8a;
-    --checkbox-indicator: #ffffff;
-
+    --checkbox-border: oklch(55% 0.15 250);
+    --checkbox-border-hover: oklch(45% 0.15 250);
+    --checkbox-checked-bg: oklch(55% 0.15 250);
+    --checkbox-checked-border: oklch(45% 0.15 250);
+    --checkbox-indicator: oklch(100% 0 0);
+    
     /* Enhanced radio button colors for high visibility */
-    --radio-border: #4a6fa5;
-    --radio-border-hover: #3a5a8a;
-    --radio-checked-bg: #4a6fa5;
-    --radio-checked-border: #3a5a8a;
-    --radio-indicator: #ffffff;
+    --radio-border: oklch(55% 0.15 250);
+    --radio-border-hover: oklch(45% 0.15 250);
+    --radio-checked-bg: oklch(55% 0.15 250);
+    --radio-checked-border: oklch(45% 0.15 250);
+    --radio-indicator: oklch(100% 0 0);
   }
 
   .dark {
-    /* Classic Dark Mode */
-    --background: #1a1d23;
-    --foreground: #e9ecef;
-
-    --card: #25282e;
-    --card-foreground: #e9ecef;
-
-    --popover: #25282e;
-    --popover-foreground: #e9ecef;
-
-    --primary: #6b8fc7;
-    --primary-foreground: #ffffff;
-
-    --secondary: #343a40;
-    --secondary-foreground: #e9ecef;
-
-    --muted: #2d3139;
-    --muted-foreground: #adb5bd;
-
-    --accent: #8fa9c9;
-    --accent-foreground: #ffffff;
-
-    --destructive: #d47a7f;
-    --destructive-foreground: #ffffff;
-
-    --success: #7fb599;
-    --success-foreground: #ffffff;
-
-    --warning: #ddb88a;
-    --warning-foreground: #212529;
-
-    --border: #495057;
-    --input: #2d3139;
-    --ring: #6b8fc7;
-
+    /* Modern Dark Mode */
+    --background: oklch(15% 0.02 240);
+    --foreground: oklch(95% 0.01 240);
+    
+    --card: oklch(20% 0.02 240);
+    --card-foreground: oklch(95% 0.01 240);
+    
+    --popover: oklch(20% 0.02 240);
+    --popover-foreground: oklch(95% 0.01 240);
+    
+    --primary: oklch(65% 0.15 250);
+    --primary-foreground: oklch(100% 0 0);
+    
+    --secondary: oklch(25% 0.02 240);
+    --secondary-foreground: oklch(95% 0.01 240);
+    
+    --muted: oklch(22% 0.02 240);
+    --muted-foreground: oklch(60% 0.02 240);
+    
+    --accent: oklch(70% 0.12 250);
+    --accent-foreground: oklch(100% 0 0);
+    
+    --destructive: oklch(60% 0.18 20);
+    --destructive-foreground: oklch(100% 0 0);
+    
+    --success: oklch(65% 0.15 150);
+    --success-foreground: oklch(100% 0 0);
+    
+    --warning: oklch(75% 0.15 60);
+    --warning-foreground: oklch(20% 0.02 240);
+    
+    --border: oklch(30% 0.02 240);
+    --input: oklch(22% 0.02 240);
+    --ring: oklch(65% 0.15 250);
+    
     /* Modal-specific colors for high contrast in dark mode - fully opaque */
-    --modal-overlay: #000000;
-    --modal-background: #2d3139;
-    --modal-border: #495057;
-
+    --modal-overlay: oklch(0% 0 0);
+    --modal-background: oklch(22% 0.02 240);
+    --modal-border: oklch(30% 0.02 240);
+    
     /* Enhanced checkbox colors for high visibility in dark mode */
-    --checkbox-border: #6b8fc7;
-    --checkbox-border-hover: #8fa9c9;
-    --checkbox-checked-bg: #6b8fc7;
-    --checkbox-checked-border: #8fa9c9;
-    --checkbox-indicator: #ffffff;
-
+    --checkbox-border: oklch(65% 0.15 250);
+    --checkbox-border-hover: oklch(70% 0.12 250);
+    --checkbox-checked-bg: oklch(65% 0.15 250);
+    --checkbox-checked-border: oklch(70% 0.12 250);
+    --checkbox-indicator: oklch(100% 0 0);
+    
     /* Enhanced radio button colors for high visibility in dark mode */
-    --radio-border: #6b8fc7;
-    --radio-border-hover: #8fa9c9;
-    --radio-checked-bg: #6b8fc7;
-    --radio-checked-border: #8fa9c9;
-    --radio-indicator: #ffffff;
+    --radio-border: oklch(65% 0.15 250);
+    --radio-border-hover: oklch(70% 0.12 250);
+    --radio-checked-bg: oklch(65% 0.15 250);
+    --radio-checked-border: oklch(70% 0.12 250);
+    --radio-indicator: oklch(100% 0 0);
   }
 }
 
@@ -122,40 +122,40 @@
   * {
     @apply border-border;
   }
-
+  
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "kern" 1;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
-
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold;
-    letter-spacing: normal;
+    letter-spacing: -0.01em;
   }
-
+  
   h1 {
     @apply text-4xl;
   }
-
+  
   h2 {
     @apply text-3xl;
   }
-
+  
   h3 {
     @apply text-2xl;
   }
-
+  
   h4 {
     @apply text-xl;
   }
-
+  
   h5 {
     @apply text-lg;
   }
-
+  
   h6 {
     @apply text-base;
   }
@@ -171,42 +171,42 @@
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
-
-  /* Dialog content - solid background with gentle shadow and no transparency */
+  
+  /* Dialog content - solid background with modern shadow and no transparency */
   [data-radix-dialog-content],
   [data-radix-alert-dialog-content] {
     background-color: var(--modal-background) !important;
     border: 1px solid var(--modal-border) !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15),
-                0 4px 12px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 
+                0 8px 24px rgba(0, 0, 0, 0.2) !important;
     border-radius: var(--radius) !important;
     opacity: 1 !important;
   }
-
+  
   /* Dark mode dialog overlay */
   .dark [data-radix-dialog-overlay],
   .dark [data-radix-alert-dialog-overlay] {
     background-color: rgba(0, 0, 0, 0.85) !important;
   }
-
+  
   /* Dark mode dialog content */
   .dark [data-radix-dialog-content],
   .dark [data-radix-alert-dialog-content] {
     background-color: var(--modal-background) !important;
     border: 1px solid var(--modal-border) !important;
   }
-
+  
   /* Ensure no transparency in modal components */
   .modal-solid-bg {
     background-color: var(--modal-background) !important;
     opacity: 1 !important;
   }
-
+  
   /* Ensure popover/select dropdowns are also solid */
   [data-radix-popper-content-wrapper] {
     z-index: 100;
   }
-
+  
   /* Enhanced Checkbox Styling - Significantly More Visible and Prominent */
   button[role="checkbox"] {
     width: 22px !important;
@@ -220,14 +220,14 @@
     cursor: pointer !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   }
-
+  
   /* Checkbox hover state */
   button[role="checkbox"]:hover {
     border-color: var(--checkbox-border-hover) !important;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15) !important;
     transform: scale(1.05);
   }
-
+  
   /* Checkbox focus state */
   button[role="checkbox"]:focus-visible {
     outline: none !important;
@@ -235,7 +235,7 @@
     ring-offset: 2px !important;
     border-color: var(--checkbox-border-hover) !important;
   }
-
+  
   /* Checkbox checked state */
   button[role="checkbox"][data-state="checked"],
   button[role="checkbox"][aria-checked="true"] {
@@ -243,14 +243,14 @@
     border-color: var(--checkbox-checked-border) !important;
     box-shadow: 0 3px 8px rgba(74, 111, 165, 0.3) !important;
   }
-
+  
   /* Checkbox checked hover state */
   button[role="checkbox"][data-state="checked"]:hover,
   button[role="checkbox"][aria-checked="true"]:hover {
     background-color: var(--checkbox-border-hover) !important;
     transform: scale(1.05);
   }
-
+  
   /* Checkbox indeterminate state */
   button[role="checkbox"][data-state="indeterminate"],
   button[role="checkbox"][aria-checked="mixed"] {
@@ -258,7 +258,7 @@
     border-color: var(--checkbox-checked-border) !important;
     box-shadow: 0 3px 8px rgba(74, 111, 165, 0.3) !important;
   }
-
+  
   /* Checkbox indicator (checkmark) styling */
   button[role="checkbox"] svg {
     width: 16px !important;
@@ -266,7 +266,7 @@
     color: var(--checkbox-indicator) !important;
     stroke-width: 3px !important;
   }
-
+  
   /* Ensure checkbox is visible in table cells */
   td button[role="checkbox"],
   th button[role="checkbox"] {
@@ -275,35 +275,35 @@
     align-items: center !important;
     justify-content: center !important;
   }
-
+  
   /* Dark mode checkbox adjustments */
   .dark button[role="checkbox"] {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
   }
-
+  
   .dark button[role="checkbox"]:hover {
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4) !important;
   }
-
+  
   .dark button[role="checkbox"][data-state="checked"],
   .dark button[role="checkbox"][aria-checked="true"],
   .dark button[role="checkbox"][data-state="indeterminate"],
   .dark button[role="checkbox"][aria-checked="mixed"] {
     box-shadow: 0 3px 8px rgba(107, 143, 199, 0.4) !important;
   }
-
+  
   /* Disabled checkbox state */
   button[role="checkbox"]:disabled {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
     transform: none !important;
   }
-
+  
   button[role="checkbox"]:disabled:hover {
     transform: none !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   }
-
+  
   /* Enhanced Radio Button Styling - Significantly More Visible and Prominent */
   button[role="radio"],
   .enhanced-radio {
@@ -319,7 +319,7 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
     position: relative !important;
   }
-
+  
   /* Radio button hover state */
   button[role="radio"]:hover,
   .enhanced-radio:hover {
@@ -327,7 +327,7 @@
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18) !important;
     transform: scale(1.08);
   }
-
+  
   /* Radio button focus state */
   button[role="radio"]:focus-visible,
   .enhanced-radio:focus-visible {
@@ -335,7 +335,7 @@
     box-shadow: 0 0 0 4px var(--ring) !important;
     border-color: var(--radio-border-hover) !important;
   }
-
+  
   /* Radio button checked state */
   button[role="radio"][data-state="checked"],
   button[role="radio"][aria-checked="true"],
@@ -345,7 +345,7 @@
     border-color: var(--radio-checked-border) !important;
     box-shadow: 0 4px 12px rgba(74, 111, 165, 0.35) !important;
   }
-
+  
   /* Radio button checked hover state */
   button[role="radio"][data-state="checked"]:hover,
   button[role="radio"][aria-checked="true"]:hover,
@@ -355,7 +355,7 @@
     transform: scale(1.08);
     box-shadow: 0 4px 14px rgba(74, 111, 165, 0.4) !important;
   }
-
+  
   /* Radio button indicator (inner circle) styling */
   button[role="radio"] span[data-state="checked"],
   button[role="radio"][data-state="checked"] span,
@@ -371,32 +371,32 @@
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
   }
-
+  
   /* Dark mode radio button adjustments */
   .dark button[role="radio"],
   .dark .enhanced-radio {
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4) !important;
   }
-
+  
   .dark button[role="radio"]:hover,
   .dark .enhanced-radio:hover {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
   }
-
+  
   .dark button[role="radio"][data-state="checked"],
   .dark button[role="radio"][aria-checked="true"],
   .dark .enhanced-radio[data-state="checked"],
   .dark .enhanced-radio[aria-checked="true"] {
     box-shadow: 0 4px 12px rgba(107, 143, 199, 0.45) !important;
   }
-
+  
   .dark button[role="radio"][data-state="checked"]:hover,
   .dark button[role="radio"][aria-checked="true"]:hover,
   .dark .enhanced-radio[data-state="checked"]:hover,
   .dark .enhanced-radio[aria-checked="true"]:hover {
     box-shadow: 0 4px 14px rgba(107, 143, 199, 0.5) !important;
   }
-
+  
   /* Disabled radio button state */
   button[role="radio"]:disabled,
   .enhanced-radio:disabled {
@@ -404,7 +404,7 @@
     cursor: not-allowed !important;
     transform: none !important;
   }
-
+  
   button[role="radio"]:disabled:hover,
   .enhanced-radio:disabled:hover {
     transform: none !important;
@@ -434,20 +434,20 @@
   overflow: hidden;
 }
 
-/* Classic scrollbar styling */
+/* Modern scrollbar styling */
 ::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
   background-color: var(--muted);
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
 }
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--primary);
-  border-radius: 0.25rem;
+  border-radius: 0.5rem;
   border: 2px solid var(--muted);
 }
 
@@ -460,7 +460,14 @@ button, a, input, select, textarea {
   @apply transition-all duration-200;
 }
 
-/* Classic focus styles */
+/* Modern focus styles */
 *:focus-visible {
   @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
+}
+
+/* Backdrop blur support */
+@supports (backdrop-filter: blur(10px)) {
+  .backdrop-blur {
+    backdrop-filter: blur(10px);
+  }
 }

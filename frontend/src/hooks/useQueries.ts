@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useFileUpload } from '../blob-storage/FileStorage';
-import type { Product, ProductInput, ProductPage, ProductUpdateFields } from '@/backend';
+import type { Product, ProductInput, ProductPage, ProductUpdateFields, ShoppingItem, UserProfile } from '@/backend';
+import type { Principal } from '@icp-sdk/core/principal';
 
 export interface ProductFilters {
     name: string;
@@ -27,7 +28,7 @@ export interface ProductQueryParams {
 // Helper function to convert date string to nanosecond timestamp
 function dateToNanoseconds(dateString: string, endOfDay: boolean = false): bigint {
     const date = new Date(dateString);
-
+    
     if (endOfDay) {
         // Set to end of day: 23:59:59.999
         date.setHours(23, 59, 59, 999);
@@ -35,7 +36,7 @@ function dateToNanoseconds(dateString: string, endOfDay: boolean = false): bigin
         // Set to start of day: 00:00:00.000
         date.setHours(0, 0, 0, 0);
     }
-
+    
     // Convert milliseconds to nanoseconds (multiply by 1,000,000)
     return BigInt(date.getTime()) * BigInt(1_000_000);
 }
@@ -60,16 +61,16 @@ export function useGetAllProducts(params: ProductQueryParams) {
             // Convert date strings to nanosecond timestamps for the backend
             // For "from" dates, use start of day (00:00:00)
             // For "to" dates, use end of day (23:59:59.999)
-            const createdFrom = params.filters.createdFrom
+            const createdFrom = params.filters.createdFrom 
                 ? dateToNanoseconds(params.filters.createdFrom, false)
                 : null;
-            const createdTo = params.filters.createdTo
+            const createdTo = params.filters.createdTo 
                 ? dateToNanoseconds(params.filters.createdTo, true)
                 : null;
-            const updatedFrom = params.filters.updatedFrom
+            const updatedFrom = params.filters.updatedFrom 
                 ? dateToNanoseconds(params.filters.updatedFrom, false)
                 : null;
-            const updatedTo = params.filters.updatedTo
+            const updatedTo = params.filters.updatedTo 
                 ? dateToNanoseconds(params.filters.updatedTo, true)
                 : null;
 
@@ -107,6 +108,19 @@ export function useGetProduct(id: bigint) {
     });
 }
 
+export function useGetUserProfile(principal: Principal | undefined) {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<UserProfile | null>({
+        queryKey: ['userProfile', principal?.toString()],
+        queryFn: async () => {
+            if (!actor || !principal) return null;
+            return actor.getUserProfile(principal);
+        },
+        enabled: !!actor && !isFetching && !!principal,
+    });
+}
+
 export function useGetAllCategories() {
     const { actor, isFetching } = useActor();
 
@@ -136,7 +150,7 @@ export function useCreateProduct() {
                 const fileExtension = imageFile.name.split('.').pop() || 'jpg';
                 const timestamp = Date.now();
                 const path = `products/${timestamp}-${input.sku}.${fileExtension}`;
-
+                
                 const result = await uploadFile(path, imageFile);
                 imagePath = result.path;
             }
@@ -174,7 +188,7 @@ export function useUpdateProduct() {
                 const fileExtension = imageFile.name.split('.').pop() || 'jpg';
                 const timestamp = Date.now();
                 const path = `products/${timestamp}-${input.sku}.${fileExtension}`;
-
+                
                 const result = await uploadFile(path, imageFile);
                 imagePath = result.path;
             }
@@ -263,14 +277,14 @@ export function useBulkCreateSampleProducts() {
     return useMutation({
         mutationFn: async () => {
             if (!actor) throw new Error('Actor not initialized');
-
+            
             // Generate 100 sample products on the client side
             const categories = ['Electronics', 'Clothing', 'Home & Garden', 'Sports', 'Books', 'Toys', 'Food', 'Beauty'];
             const adjectives = ['Premium', 'Deluxe', 'Professional', 'Classic', 'Modern', 'Vintage', 'Eco-Friendly', 'Smart'];
             const nouns = ['Widget', 'Gadget', 'Tool', 'Device', 'Item', 'Product', 'Accessory', 'Kit'];
-
+            
             const products: ProductInput[] = [];
-
+            
             for (let i = 1; i <= 100; i++) {
                 const adjective = adjectives[Math.floor(Math.random() * adjectives.length)];
                 const noun = nouns[Math.floor(Math.random() * nouns.length)];
@@ -279,7 +293,7 @@ export function useBulkCreateSampleProducts() {
                 const price = Math.round((Math.random() * 999 + 1) * 100) / 100; // $1.00 - $1000.00
                 const quantity = BigInt(Math.floor(Math.random() * 500)); // 0-499
                 const ordering = BigInt(i);
-
+                
                 products.push({
                     name: `${adjective} ${noun} ${i}`,
                     description: `This is a sample ${adjective.toLowerCase()} ${noun.toLowerCase()} for demonstration purposes. Product number ${i}.`,
@@ -292,12 +306,12 @@ export function useBulkCreateSampleProducts() {
                     imagePath: undefined,
                 });
             }
-
+            
             // Create all products
             const results = await Promise.all(
                 products.map(product => actor.createProduct(product))
             );
-
+            
             return results.length;
         },
         onSuccess: (count) => {
@@ -305,5 +319,29 @@ export function useBulkCreateSampleProducts() {
             queryClient.invalidateQueries({ queryKey: ['categories'] });
             return count;
         },
+    });
+}
+
+export function useCreateCheckoutSession() {
+    const { actor } = useActor();
+
+    return useMutation({
+        mutationFn: async ({ items, successUrl, cancelUrl }: { items: ShoppingItem[]; successUrl: string; cancelUrl: string }) => {
+            if (!actor) throw new Error('Actor not initialized');
+            return actor.createCheckoutSession(items, successUrl, cancelUrl);
+        },
+    });
+}
+
+export function useIsStripeConfigured() {
+    const { actor, isFetching } = useActor();
+
+    return useQuery<boolean>({
+        queryKey: ['stripeConfigured'],
+        queryFn: async () => {
+            if (!actor) return false;
+            return actor.isStripeConfigured();
+        },
+        enabled: !!actor && !isFetching,
     });
 }

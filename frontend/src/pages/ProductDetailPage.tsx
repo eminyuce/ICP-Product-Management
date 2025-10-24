@@ -1,4 +1,4 @@
-import { ArrowLeft, Edit, Trash2, Package, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Edit, Trash2, Package, ImageIcon, Tag, User } from 'lucide-react';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductDialog from '@/components/ProductDialog';
 import DeleteProductDialog from '@/components/DeleteProductDialog';
-import { useGetProduct } from '@/hooks/useQueries';
+import { useGetProduct, useGetUserProfile } from '@/hooks/useQueries';
 import { useFileUrl } from '../blob-storage/FileStorage';
 import { getStatusLabel } from '@/lib/statusLabels';
 import { getStatusColor } from '@/lib/statusColors';
@@ -24,6 +24,10 @@ export default function ProductDetailPage() {
 
     const { data: product, isLoading } = useGetProduct(BigInt(productId));
     const { data: imageUrl } = useFileUrl(product?.imagePath || '');
+    
+    // Fetch user profiles for audit information
+    const { data: createdByProfile } = useGetUserProfile(product?.createdBy);
+    const { data: updatedByProfile } = useGetUserProfile(product?.updatedBy);
 
     const formatTimestamp = (timestamp: bigint) => {
         const date = new Date(Number(timestamp) / 1_000_000);
@@ -35,6 +39,28 @@ export default function ProductDetailPage() {
             style: 'currency',
             currency: 'USD',
         }).format(price);
+    };
+
+    const calculateDiscountedPrice = (price: number, discount?: { discountType: string; value: number }) => {
+        if (!discount) return price;
+        
+        if (discount.discountType === 'percentage') {
+            return price * (1 - discount.value / 100);
+        } else {
+            return Math.max(0, price - discount.value);
+        }
+    };
+
+    const formatUserInfo = (principal: any, profile: any) => {
+        if (profile?.name) {
+            return profile.name;
+        }
+        // Fallback to showing a shortened principal if no profile name
+        const principalStr = principal?.toString() || '';
+        if (principalStr.length > 20) {
+            return `${principalStr.substring(0, 10)}...${principalStr.substring(principalStr.length - 6)}`;
+        }
+        return principalStr || 'Unknown';
     };
 
     if (isLoading) {
@@ -96,10 +122,13 @@ export default function ProductDetailPage() {
         );
     }
 
+    const discountedPrice = calculateDiscountedPrice(product.price, product.discount);
+    const hasDiscount = !!product.discount;
+
     return (
         <div className="flex min-h-screen flex-col bg-background">
             <Header />
-
+            
             <main className="flex-1 w-full">
                 <div className="mx-auto w-[85%] py-12 animate-fade-in">
                     <Button
@@ -236,10 +265,60 @@ export default function ProductDetailPage() {
                                         <h3 className="text-sm font-semibold text-muted-foreground mb-2">
                                             Price
                                         </h3>
-                                        <p className="text-3xl font-semibold text-primary">
-                                            {formatPrice(product.price)}
-                                        </p>
+                                        {hasDiscount ? (
+                                            <div className="space-y-2">
+                                                <div className="flex items-center gap-3">
+                                                    <p className="text-3xl font-semibold text-primary">
+                                                        {formatPrice(discountedPrice)}
+                                                    </p>
+                                                    <Badge variant="destructive" className="gap-1">
+                                                        <Tag className="h-3 w-3" />
+                                                        {product.discount?.discountType === 'percentage' 
+                                                            ? `${product.discount.value}% off`
+                                                            : `$${product.discount?.value.toFixed(2)} off`
+                                                        }
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-lg text-muted-foreground line-through">
+                                                    {formatPrice(product.price)}
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <p className="text-3xl font-semibold text-primary">
+                                                {formatPrice(product.price)}
+                                            </p>
+                                        )}
                                     </div>
+
+                                    {hasDiscount && (
+                                        <>
+                                            <Separator className="bg-border" />
+                                            <div>
+                                                <h3 className="text-sm font-semibold text-muted-foreground mb-2">
+                                                    Discount Details
+                                                </h3>
+                                                <div className="space-y-1">
+                                                    <p className="text-base">
+                                                        <span className="font-semibold">Type:</span>{' '}
+                                                        {product.discount?.discountType === 'percentage' ? 'Percentage' : 'Currency'}
+                                                    </p>
+                                                    <p className="text-base">
+                                                        <span className="font-semibold">Value:</span>{' '}
+                                                        {product.discount?.discountType === 'percentage' 
+                                                            ? `${product.discount.value}%`
+                                                            : formatPrice(product.discount?.value || 0)
+                                                        }
+                                                    </p>
+                                                    <p className="text-base">
+                                                        <span className="font-semibold">You save:</span>{' '}
+                                                        <span className="text-destructive font-semibold">
+                                                            {formatPrice(product.price - discountedPrice)}
+                                                        </span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
 
                                     <Separator className="bg-border" />
 
@@ -271,23 +350,35 @@ export default function ProductDetailPage() {
 
                             <Card className="border border-border shadow-classic-md rounded-lg overflow-hidden animate-scale-in">
                                 <CardHeader className="bg-secondary border-b border-border">
-                                    <CardTitle className="text-xl font-semibold">Timestamps</CardTitle>
+                                    <CardTitle className="text-xl font-semibold">Audit Information</CardTitle>
                                 </CardHeader>
                                 <CardContent className="p-6 space-y-5">
                                     <div>
-                                        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
-                                            Created
+                                        <h3 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
+                                            <User className="h-4 w-4" />
+                                            Created By
                                         </h3>
-                                        <p className="text-sm">{formatTimestamp(product.created_at)}</p>
+                                        <p className="text-base font-medium">
+                                            {formatUserInfo(product.createdBy, createdByProfile)}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            {formatTimestamp(product.created_at)}
+                                        </p>
                                     </div>
 
                                     <Separator className="bg-border" />
 
                                     <div>
-                                        <h3 className="text-sm font-semibold text-muted-foreground mb-2">
-                                            Last Updated
+                                        <h3 className="text-sm font-semibold text-muted-foreground mb-2 flex items-center gap-2">
+                                            <User className="h-4 w-4" />
+                                            Last Edited By
                                         </h3>
-                                        <p className="text-sm">{formatTimestamp(product.updated_at)}</p>
+                                        <p className="text-base font-medium">
+                                            {formatUserInfo(product.updatedBy, updatedByProfile)}
+                                        </p>
+                                        <p className="text-sm text-muted-foreground mt-1">
+                                            {formatTimestamp(product.updated_at)}
+                                        </p>
                                     </div>
                                 </CardContent>
                             </Card>
